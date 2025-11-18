@@ -1,0 +1,79 @@
+.icone {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: #ffcc00;
+    cursor: pointer;
+    transition: transform 0.2s, color 0.2s;
+  }
+  
+.combat-menu {
+    background-color: #1a1a1a;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: Arial, sans-serif;
+    width: 100vw;
+  }
+  
+  h1 {
+    margin-bottom: 10px;
+    color: #ffcc00;
+    text-transform: uppercase;
+  }
+  
+  .subtitle {
+    margin-bottom: 30px;
+    color: #aaa;
+  }
+  
+  .menu {
+    display: grid;
+    grid-template-columns: repeat(2, 250px);
+    gap: 20px;
+  }
+  
+  button {
+    background-color: #333;
+    border: 2px solid #555;
+    color: white;
+    font-size: 16px;
+    padding: 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  
+  button:hover {
+    background-color: #ffcc00;
+    color: #000;
+    transform: scale(1.05);
+  }
+  
+  .profil {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .bouton-profil {
+    background-color: #444;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s;
+  }
+  
+  .bouton-profil:hover {
+    background-color: #666;
+    transform: scale(1.05);
+  }
