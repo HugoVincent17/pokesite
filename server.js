@@ -25,7 +25,7 @@ app.get("/pokemon", async (req, res) => {
         FROM pokemon p
         LEFT JOIN posseder po ON p.num_pokedex = po.num_pokedex
         LEFT JOIN types t ON t.id_type = po.id_type
-        ORDER BY p.num_pokedex
+        ORDER BY p.num_pokedex, po.type_ordre;
     `);
 
     const grouped = {};

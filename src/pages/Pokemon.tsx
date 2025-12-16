@@ -11,6 +11,7 @@ type Pokemon = {
 
 export default function Pokemon() {
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     async function fetchData() {
@@ -22,8 +23,31 @@ export default function Pokemon() {
     
   }, []);
 
+  const filteredPokemons = pokemons.filter((p) =>
+    p.nom.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
-    <div style={{ display: "flex", justifyContent: "center", marginTop: "2rem", marginBottom: "2rem" }}>
+    <div style={{ display: "flex", flexDirection: "column", marginTop: "2rem", marginBottom: "2rem" }}>
+      <h1 style={{ textAlign: "center", width: "100%" }}>Liste des Pokémons</h1>
+      <input
+        type="text"
+        placeholder="Rechercher un Pokémon..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        style={{
+          padding: "0.5rem 1rem",
+          marginBottom: "1.5rem",
+          fontSize: "1rem",
+          borderRadius: "8px",
+          border: "1px solid #ccc",
+          width: "250px",
+          textAlign: "left",
+          display: "block",
+          marginLeft: "auto",
+          marginRight: "auto"
+        }}
+      />
       <div
         style={{
           display: "flex",
@@ -33,7 +57,7 @@ export default function Pokemon() {
           maxWidth: "100%"
         }}
       >
-        {pokemons.map((pokemon) => {
+        {filteredPokemons.map((pokemon) => {
           const mainType = (pokemon.types && pokemon.types.length > 0) ? pokemon.types[0] : "Normal";
 
           return (
@@ -54,7 +78,7 @@ export default function Pokemon() {
                 <p>{pokemon.num_pokedex}</p>
                 <p>{pokemon.nom}</p>
         
-                {/* Afficher tous les types sous forme d’étiquettes */}
+                
                 <div style={{ display: "flex", gap: "4px", justifyContent: "center" }}>
                   {(pokemon.types || []).map((t) => (
                     <span
@@ -63,7 +87,7 @@ export default function Pokemon() {
                         padding: "2px 6px",
                         borderRadius: "6px",
                         background: couleurType[t],
-                        color: "white",
+                        color: ["Sol", "Électrik", "Glace", "Plante", "Normal"].includes(t) ? "black" : "white",
                         fontSize: "0.7rem",
                       }}
                     >
