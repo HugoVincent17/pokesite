@@ -61,7 +61,7 @@ return (
             padding: "4px 8px",
             borderRadius: "8px",
             background: couleurType[t],
-            color: "white",
+            color: ["Sol", "Électrik", "Glace", "Plante", "Normal", "Acier"].includes(t) ? "black" : "white",
             fontWeight: "bold",
           }}
         >

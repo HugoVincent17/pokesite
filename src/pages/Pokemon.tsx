@@ -12,6 +12,7 @@ type Pokemon = {
 export default function Pokemon() {
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
   const [search, setSearch] = useState("");
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -23,9 +24,25 @@ export default function Pokemon() {
     
   }, []);
 
-  const filteredPokemons = pokemons.filter((p) =>
-    p.nom.toLowerCase().includes(search.toLowerCase())
-  );
+  const allTypes = Array.from(
+    new Set(pokemons.flatMap((p) => p.types))
+  ).sort();
+
+  const filteredPokemons = pokemons.filter((p) => {
+    const matchesSearch = p.nom.toLowerCase().includes(search.toLowerCase());
+    const matchesTypes =
+      selectedTypes.length === 0 ||
+      selectedTypes.every((t) => p.types.includes(t));
+    return matchesSearch && matchesTypes;
+  });
+
+  const toggleType = (type: string) => {
+    setSelectedTypes((prev) =>
+      prev.includes(type)
+        ? prev.filter((t) => t !== type) 
+        : [...prev, type] 
+    );
+  };
 
   return (
     <div style={{ display: "flex", flexDirection: "column", marginTop: "2rem", marginBottom: "2rem" }}>
@@ -48,6 +65,32 @@ export default function Pokemon() {
           marginRight: "auto"
         }}
       />
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(3, max-content)",
+          justifyContent: "center",
+          gap: "0.5rem",
+          marginBottom: "2rem",
+        }}
+      >
+        {allTypes.map((t) => (
+          <button
+            key={t}
+            onClick={() => toggleType(t)}
+            style={{
+              background: couleurType[t],
+              color: ["Sol", "Électrik", "Glace", "Plante", "Normal", "Acier"].includes(t) ? "black" : "white",
+              border: selectedTypes.includes(t) ? "3px solid #fff" : "none",
+              padding: "0.5rem 1rem",
+              borderRadius: "8px",
+              cursor: "pointer",
+            }}
+          >
+            {t}
+          </button>
+        ))}
+      </div>
       <div
         style={{
           display: "flex",
@@ -87,7 +130,7 @@ export default function Pokemon() {
                         padding: "2px 6px",
                         borderRadius: "6px",
                         background: couleurType[t],
-                        color: ["Sol", "Électrik", "Glace", "Plante", "Normal"].includes(t) ? "black" : "white",
+                        color: ["Sol", "Électrik", "Glace", "Plante", "Normal", "Acier"].includes(t) ? "black" : "white",
                         fontSize: "0.7rem",
                       }}
                     >

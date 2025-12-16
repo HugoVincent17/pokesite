@@ -29,7 +29,7 @@ app.get("/pokemon", async (req, res) => {
     `);
 
     const grouped = {};
-
+    
     for (const row of rows) {
       if (!grouped[row.num_pokedex]) {
         grouped[row.num_pokedex] = {
