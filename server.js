@@ -58,7 +58,8 @@ app.get("/pokemon/:id", async (req, res) => {
        FROM pokemon p
        LEFT JOIN posseder po ON p.num_pokedex = po.num_pokedex
        LEFT JOIN types t ON t.id_type = po.id_type
-       WHERE p.num_pokedex = ?`,
+       WHERE p.num_pokedex = ?
+       ORDER BY po.type_ordre`,
       [req.params.id]
     );
 
