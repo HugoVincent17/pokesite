@@ -13,6 +13,7 @@ export default function Pokemon() {
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
   const [search, setSearch] = useState("");
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [doubleType, setDoubleType] = useState<boolean>(true);
 
   useEffect(() => {
     async function fetchData() {
@@ -31,8 +32,12 @@ export default function Pokemon() {
   const filteredPokemons = pokemons.filter((p) => {
     const matchesSearch = p.nom.toLowerCase().includes(search.toLowerCase());
     const matchesTypes =
-      selectedTypes.length === 0 ||
-      selectedTypes.every((t) => p.types.includes(t));
+  selectedTypes.length === 0 ||
+  (doubleType
+    ? selectedTypes.every((t) => p.types.includes(t)) // ET
+    : selectedTypes.some((t) => p.types.includes(t))  // OU
+  );
+
     return matchesSearch && matchesTypes;
   });
 
@@ -65,6 +70,17 @@ export default function Pokemon() {
           marginRight: "auto"
         }}
       />
+      <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}>
+  <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", cursor: "pointer" }}>
+    <input
+      type="checkbox"
+      checked={doubleType}
+      onChange={() => setDoubleType(!doubleType)}
+    />
+    <strong>Double Type</strong>
+  </label>
+</div>
+
       <div
         style={{
           display: "grid",
