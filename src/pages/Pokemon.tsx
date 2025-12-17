@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { couleurType } from "../couleurType.ts";
+import { couleurRarete } from "../couleurRarete.ts";
 
 type Pokemon = {
   num_pokedex: number;
   nom: string;
   img_mini: string;
   types: string[];
+  rarete: string;
 };
 
 export default function Pokemon() {
@@ -133,12 +135,28 @@ export default function Pokemon() {
                 boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
                 background: `linear-gradient(145deg, ${couleurType[mainType] || couleurType["Normal"]} 0%, #ffffff30 100%)`,
                 cursor: "pointer",
+                transition: "transform 0.3s ease, box-shadow 0.3s ease", // <-- ajout de la transition
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLDivElement).style.transform = "scale(1.05)";
+                (e.currentTarget as HTMLDivElement).style.boxShadow = "0 8px 24px rgba(0,0,0,0.3)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLDivElement).style.transform = "scale(1)";
+                (e.currentTarget as HTMLDivElement).style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
               }}
             >
               <Link to={`/pokemons/${pokemon.num_pokedex}`} style={{ textDecoration: "none", color: "inherit" }}>
                 <img src={pokemon.img_mini} alt={pokemon.nom} style={{ maxWidth: "100%", height: "auto", margin: "0 auto" }} />
                 <p>{pokemon.num_pokedex}</p>
-                <p>{pokemon.nom}</p>
+                <p
+                  style={{
+                    fontWeight: "bold",
+                    color: couleurRarete[pokemon.rarete] || "white"
+                  }}
+                >
+                  {pokemon.nom}
+                </p>
         
                 
                 <div style={{ display: "flex", gap: "4px", justifyContent: "center" }}>

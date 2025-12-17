@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { couleurType } from "../couleurType.ts";
+import { couleurRarete } from "../couleurRarete.ts";
 
 type Pokemon = {
   num_pokedex: number;
@@ -14,6 +15,7 @@ type Pokemon = {
   attaque_spe: number;
   defense_spe: number;
   vitesse: number;
+  rarete: string;
 };
 
 export default function PokemonDetail() {
@@ -53,7 +55,6 @@ export default function PokemonDetail() {
   if (!pokemon) return <p>Chargement...</p>;
 
 const mainType = pokemon.types[0] || "Normal";
-
 return (
   <div
     style={{
@@ -63,7 +64,15 @@ return (
       borderRadius: "16px",
     }}
   >
-    <h1>{pokemon.nom}</h1>
+    <h1
+      style={{
+        fontWeight: "bold",
+        color: couleurRarete[pokemon.rarete] || "white"
+      }}
+    >
+      {pokemon.nom}
+    </h1>
+
     <div style={{ display: "flex", justifyContent: "center", gap: "2rem", alignItems: "center" }}>
       <div>
         <p>Normal</p>
