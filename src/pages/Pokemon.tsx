@@ -83,8 +83,8 @@ export default function Pokemon() {
 
       <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3, max-content)",
+          display: "flex",
+          flexWrap: "wrap",
           justifyContent: "center",
           gap: "0.5rem",
           marginBottom: "2rem",
@@ -101,6 +101,9 @@ export default function Pokemon() {
               padding: "0.5rem 1rem",
               borderRadius: "8px",
               cursor: "pointer",
+              boxSizing: "border-box",
+              width: "100px",
+              textAlign: "center"
             }}
           >
             {t}
