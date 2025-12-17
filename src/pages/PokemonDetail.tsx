@@ -8,6 +8,12 @@ type Pokemon = {
   img: string;
   img_shiny: string;
   types: string[];
+  hp: number;
+  attaque: number;
+  defense: number;
+  attaque_spe: number;
+  defense_spe: number;
+  vitesse: number;
 };
 
 export default function PokemonDetail() {
@@ -26,6 +32,23 @@ export default function PokemonDetail() {
     }
     fetchPokemon();
   }, [id]);
+
+  const stats = [
+    { label: "PV", value: pokemon?.hp },
+    { label: "ATTAQUE", value: pokemon?.attaque },
+    { label: "DÉFENSE", value: pokemon?.defense },
+    { label: "ATTAQUE SPÉCIALE", value: pokemon?.attaque_spe },
+    { label: "DÉFENSE SPÉCIALE", value: pokemon?.defense_spe },
+    { label: "VITESSE", value: pokemon?.vitesse },
+  ];
+  
+  
+  const getStatColor = (value: number) => {
+    if (value <= 49) return "red";
+    if (value <= 79) return "orange";
+    if (value <= 99) return "yellow";
+    return "#7CFC00";
+  };
 
   if (!pokemon) return <p>Chargement...</p>;
 
@@ -52,7 +75,14 @@ return (
       </div>
     </div>
 
-    {/* Afficher tous les types */}
+    <div style={{ display: "flex", justifyContent: "center", gap: "1rem", marginTop: "1rem", flexWrap: "wrap" }}>
+  {stats.map((stat) => (
+    <div key={stat.label} style={{ textAlign: "center", minWidth: "80px" }}>
+      <p style={{ fontWeight: "bold" }}>{stat.label}</p>
+      <p style={{ color: getStatColor(stat.value ?? 0), fontWeight: "bold", fontSize: "1.2rem" }}>{stat.value}</p>
+    </div>
+  ))}
+</div>
     <div style={{ display: "flex", justifyContent: "center", gap: "8px", marginTop: "1rem" }}>
       {pokemon.types.map(t => (
         <span
