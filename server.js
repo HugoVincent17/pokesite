@@ -54,7 +54,9 @@ app.get("/pokemon", async (req, res) => {
 app.get("/pokemon/:id", async (req, res) => {
   try {
     const [rows] = await db.query(
-      `SELECT p.num_pokedex, p.nom, p.img, p.img_shiny, t.nom AS nom_type
+      `SELECT p.num_pokedex, p.nom, p.img, p.img_shiny, p.hp,
+       p.attaque, p.defense, p.attaque_spe, p.defense_spe, 
+       p.vitesse, t.nom AS nom_type
        FROM pokemon p
        LEFT JOIN posseder po ON p.num_pokedex = po.num_pokedex
        LEFT JOIN types t ON t.id_type = po.id_type
@@ -73,6 +75,12 @@ app.get("/pokemon/:id", async (req, res) => {
       nom: rows[0].nom,
       img: rows[0].img,
       img_shiny: rows[0].img_shiny,
+      hp: rows[0].hp,
+      attaque: rows[0].attaque,
+      defense: rows[0].defense,
+      attaque_spe: rows[0].attaque_spe,
+      defense_spe: rows[0].defense_spe,
+      vitesse: rows[0].vitesse,
       types
     };
 
