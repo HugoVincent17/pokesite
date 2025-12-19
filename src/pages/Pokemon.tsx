@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { couleurType, couleurRarete } from "../parametres.ts";
 
+//type pokémon
 type Pokemon = {
   num_pokedex: number;
   nom: string;
@@ -17,8 +18,9 @@ type Pokemon = {
   vitesse: number;
 };
 
-type StatKey = "hp" | "attaque" | "defense" | "attaque_spe" | "defense_spe" | "vitesse";
+type StatKey = "hp" | "attaque" | "defense" | "attaque_spe" | "defense_spe" | "vitesse"; //type pour les stats
 
+//fonction pokemon useState et useEffect 
 export default function Pokemon() {
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
   const [search, setSearch] = useState("");
@@ -42,7 +44,7 @@ export default function Pokemon() {
 
   const allTypes = Array.from(
     new Set(pokemons.flatMap((p) => p.types))
-  ).sort();
+  ).sort();// liste de tous les types de pokémon disponibles
 
   let filteredPokemons = pokemons.filter((p) => {
     const matchesSearch = p.nom.toLowerCase().includes(search.toLowerCase());
@@ -51,18 +53,18 @@ export default function Pokemon() {
   (doubleType
     ? selectedTypes.every((t) => p.types.includes(t)) // ET
     : selectedTypes.some((t) => p.types.includes(t))  // OU
-  );
+  );// filtre par nom et types
 
     return matchesSearch && matchesTypes;
-  });
+  });// application des filtres
 
 if (selectedRarete) {
   filteredPokemons = filteredPokemons.filter(p => p.rarete === selectedRarete);
-}
+}// filtre par rareté
 
 if (selectedGeneration) {
   filteredPokemons = filteredPokemons.filter(p => p.generation === selectedGeneration);
-}
+}// filtre par génération
 
 filteredPokemons = filteredPokemons.filter((p) =>
   (!statFilters?.hp || (p.hp ?? 0) >= statFilters.hp) &&
@@ -71,7 +73,7 @@ filteredPokemons = filteredPokemons.filter((p) =>
   (!statFilters?.attaque_spe || (p.attaque_spe ?? 0) >= statFilters.attaque_spe) &&
   (!statFilters?.defense_spe || (p.defense_spe ?? 0) >= statFilters.defense_spe) &&
   (!statFilters?.vitesse || (p.vitesse ?? 0) >= statFilters.vitesse)
-);
+);// filtre par stats
 
   const toggleType = (type: string) => {
     setSelectedTypes((prev) =>
@@ -79,7 +81,7 @@ filteredPokemons = filteredPokemons.filter((p) =>
         ? prev.filter((t) => t !== type) 
         : [...prev, type] 
     );
-  };
+  };// fonction pour sélectionner/désélectionner un type
 
   return (
     
@@ -102,7 +104,7 @@ filteredPokemons = filteredPokemons.filter((p) =>
           marginLeft: "auto",
           marginRight: "auto"
         }}
-      />
+      />{/* barre de recherche */}
       <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem", justifyContent: "center" }}>
   {(["hp", "attaque", "defense", "attaque_spe", "defense_spe", "vitesse"] as StatKey[]).map((stat) => (
     <div key={stat} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
@@ -113,7 +115,7 @@ filteredPokemons = filteredPokemons.filter((p) =>
          stat === "attaque_spe" ? "ATTAQUE SPÉCIALE" :
          stat === "defense_spe" ? "DÉFENSE SPÉCIALE" :
          "VITESSE"}
-      </label>
+      </label> {/* barre de recherche pour chaque stat */}
       <input
         type="number"
         min={0}
@@ -144,7 +146,7 @@ filteredPokemons = filteredPokemons.filter((p) =>
       ))}
     </select>
   </label>
-</div>
+</div>{/* filtre par génération */}
 
       <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}>
   <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", cursor: "pointer" }}>
@@ -155,7 +157,7 @@ filteredPokemons = filteredPokemons.filter((p) =>
     />
     <strong>Double Type</strong>
   </label>
-</div>
+</div>{/* toggle pour double type */}
 
       <div
         style={{
@@ -185,7 +187,7 @@ filteredPokemons = filteredPokemons.filter((p) =>
           >
             {t}
           </button>
-        ))}
+        ))}{/* boutons pour chaque type de pokémon */}
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5, max-content)", justifyContent: "center", gap: "0.5rem", marginBottom: "1.5rem" }}>
   {Object.keys(couleurRarete).map((r) => (
@@ -203,7 +205,7 @@ filteredPokemons = filteredPokemons.filter((p) =>
     >
       {r}
     </button>
-  ))}
+  ))}{/* boutons pour chaque rareté de pokémon */}
 </div>
       <div
         style={{
@@ -215,7 +217,7 @@ filteredPokemons = filteredPokemons.filter((p) =>
         }}
       >
         {filteredPokemons.map((pokemon) => {
-          const mainType = (pokemon.types && pokemon.types.length > 0) ? pokemon.types[0] : "Normal";
+          const mainType = (pokemon.types && pokemon.types.length > 0) ? pokemon.types[0] : "Normal";{/* type principal pour le dégradé de fond et l'ordre des types sur la carte */}
 
           return (
             <div
@@ -238,7 +240,7 @@ filteredPokemons = filteredPokemons.filter((p) =>
                 (e.currentTarget as HTMLDivElement).style.transform = "scale(1)";
                 (e.currentTarget as HTMLDivElement).style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
               }}
-            >
+            >{/* carte de chaque pokémon */}
               <Link to={`/pokemons/${pokemon.num_pokedex}`} style={{ textDecoration: "none", color: "inherit" }}>
                 <img src={pokemon.img_mini} alt={pokemon.nom} style={{ maxWidth: "100%", height: "auto", margin: "0 auto" }} />
                 <p>{pokemon.num_pokedex}</p>
@@ -249,7 +251,7 @@ filteredPokemons = filteredPokemons.filter((p) =>
                   }}
                 >
                   {pokemon.nom}
-                </p>
+                </p>{/*couleur selon la rareté */}
         
                 
                 <div style={{ display: "flex", gap: "4px", justifyContent: "center" }}>
@@ -263,7 +265,7 @@ filteredPokemons = filteredPokemons.filter((p) =>
                         color: ["Sol", "Électrik", "Glace", "Plante", "Normal", "Acier"].includes(t) ? "black" : "white",
                         fontSize: "0.7rem",
                       }}
-                    >
+                    >{/* badge de type */}
                       {t}
                     </span>
                   ))}
