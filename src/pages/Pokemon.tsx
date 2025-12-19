@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { couleurType } from "../couleurType.ts";
-import { couleurRarete } from "../couleurRarete.ts";
+import { couleurType, couleurRarete } from "../parametres.ts";
 
 type Pokemon = {
   num_pokedex: number;
@@ -16,6 +15,8 @@ export default function Pokemon() {
   const [search, setSearch] = useState("");
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [doubleType, setDoubleType] = useState<boolean>(true);
+  const [selectedRarete, setSelectedRarete] = useState<string | null>(null);
+
 
   useEffect(() => {
     async function fetchData() {
@@ -26,12 +27,13 @@ export default function Pokemon() {
     fetchData();
     
   }, []);
+  
 
   const allTypes = Array.from(
     new Set(pokemons.flatMap((p) => p.types))
   ).sort();
 
-  const filteredPokemons = pokemons.filter((p) => {
+  let filteredPokemons = pokemons.filter((p) => {
     const matchesSearch = p.nom.toLowerCase().includes(search.toLowerCase());
     const matchesTypes =
   selectedTypes.length === 0 ||
@@ -42,6 +44,12 @@ export default function Pokemon() {
 
     return matchesSearch && matchesTypes;
   });
+
+  
+
+if (selectedRarete) {
+  filteredPokemons = filteredPokemons.filter(p => p.rarete === selectedRarete);
+}
 
   const toggleType = (type: string) => {
     setSelectedTypes((prev) =>
@@ -82,7 +90,24 @@ export default function Pokemon() {
     <strong>Double Type</strong>
   </label>
 </div>
-
+<div style={{ display: "grid", gridTemplateColumns: "repeat(5, max-content)", justifyContent: "center", gap: "0.5rem", marginBottom: "1.5rem" }}>
+  {Object.keys(couleurRarete).map((r) => (
+    <button
+      key={r}
+      onClick={() => setSelectedRarete(selectedRarete === r ? null : r)}
+      style={{
+        background: couleurRarete[r],
+        color: ["Légendaire", "Fabuleux", "Fossile", "Starter"].includes(r) ? "black" : "white",
+        border: selectedRarete === r ? "3px solid #fff" : "none",
+        padding: "0.5rem 1rem",
+        borderRadius: "8px",
+        cursor: "pointer",
+      }}
+    >
+      {r}
+    </button>
+  ))}
+</div>
       <div
         style={{
           display: "flex",
