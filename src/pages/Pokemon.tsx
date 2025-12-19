@@ -8,6 +8,7 @@ type Pokemon = {
   img_mini: string;
   types: string[];
   rarete: string;
+  generation: number;
 };
 
 export default function Pokemon() {
@@ -16,6 +17,7 @@ export default function Pokemon() {
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [doubleType, setDoubleType] = useState<boolean>(true);
   const [selectedRarete, setSelectedRarete] = useState<string | null>(null);
+  const [selectedGeneration, setSelectedGeneration] = useState<number | null>(null);
 
 
   useEffect(() => {
@@ -45,10 +47,12 @@ export default function Pokemon() {
     return matchesSearch && matchesTypes;
   });
 
-  
-
 if (selectedRarete) {
   filteredPokemons = filteredPokemons.filter(p => p.rarete === selectedRarete);
+}
+
+if (selectedGeneration) {
+  filteredPokemons = filteredPokemons.filter(p => p.generation === selectedGeneration);
 }
 
   const toggleType = (type: string) => {
@@ -60,6 +64,7 @@ if (selectedRarete) {
   };
 
   return (
+    
     <div style={{ display: "flex", flexDirection: "column", marginTop: "2rem", marginBottom: "2rem" }}>
       <h1 style={{ textAlign: "center", width: "100%" }}>Liste des Pokémons</h1>
       <input
@@ -80,6 +85,22 @@ if (selectedRarete) {
           marginRight: "auto"
         }}
       />
+      <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem", gap: "0.5rem" }}>
+  <label>
+    Génération :
+    <select
+      value={selectedGeneration || ""}
+      onChange={(e) => setSelectedGeneration(e.target.value ? Number(e.target.value) : null)}
+      style={{ marginLeft: "0.5rem", padding: "0.3rem 0.5rem", borderRadius: "4px" }}
+    >
+      <option value="">Toutes</option>
+      {Array.from(new Set(pokemons.map(p => p.generation))).sort().map(g => (
+        <option key={g} value={g}>{g}</option>
+      ))}
+    </select>
+  </label>
+</div>
+
       <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}>
   <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", cursor: "pointer" }}>
     <input
@@ -90,24 +111,7 @@ if (selectedRarete) {
     <strong>Double Type</strong>
   </label>
 </div>
-<div style={{ display: "grid", gridTemplateColumns: "repeat(5, max-content)", justifyContent: "center", gap: "0.5rem", marginBottom: "1.5rem" }}>
-  {Object.keys(couleurRarete).map((r) => (
-    <button
-      key={r}
-      onClick={() => setSelectedRarete(selectedRarete === r ? null : r)}
-      style={{
-        background: couleurRarete[r],
-        color: ["Légendaire", "Fabuleux", "Fossile", "Starter"].includes(r) ? "black" : "white",
-        border: selectedRarete === r ? "3px solid #fff" : "none",
-        padding: "0.5rem 1rem",
-        borderRadius: "8px",
-        cursor: "pointer",
-      }}
-    >
-      {r}
-    </button>
-  ))}
-</div>
+
       <div
         style={{
           display: "flex",
@@ -137,6 +141,24 @@ if (selectedRarete) {
           </button>
         ))}
       </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, max-content)", justifyContent: "center", gap: "0.5rem", marginBottom: "1.5rem" }}>
+  {Object.keys(couleurRarete).map((r) => (
+    <button
+      key={r}
+      onClick={() => setSelectedRarete(selectedRarete === r ? null : r)}
+      style={{
+        background: couleurRarete[r],
+        color: ["Légendaire", "Fabuleux", "Fossile", "Starter"].includes(r) ? "black" : "white",
+        border: selectedRarete === r ? "3px solid #fff" : "none",
+        padding: "0.5rem 1rem",
+        borderRadius: "8px",
+        cursor: "pointer",
+      }}
+    >
+      {r}
+    </button>
+  ))}
+</div>
       <div
         style={{
           display: "flex",
