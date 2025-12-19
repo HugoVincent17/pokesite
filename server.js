@@ -23,6 +23,9 @@ app.get("/pokemon", async (req, res) => {
         p.img_mini,
         p.generation,
         p.rarete,
+        p.hp,
+        p.attaque, p.defense, p.attaque_spe, p.defense_spe, 
+        p.vitesse,
         t.nom AS nom_type
         FROM pokemon p
         LEFT JOIN posseder po ON p.num_pokedex = po.num_pokedex
@@ -40,6 +43,12 @@ app.get("/pokemon", async (req, res) => {
           img_mini: row.img_mini,
           generation: row.generation,
           rarete : row.rarete,
+          hp: row.hp,
+          attaque: row.attaque,
+          defense: row.defense,
+          attaque_spe: row.attaque_spe,
+          defense_spe: row.defense_spe,
+          vitesse: row.vitesse,
           types: [],
         };
       }
