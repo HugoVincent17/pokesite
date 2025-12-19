@@ -1,7 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { couleurType } from "../couleurType.ts";
-import { couleurRarete } from "../couleurRarete.ts";
+import { couleurType, couleurRarete } from "../parametres.ts";
 
 type Pokemon = {
   num_pokedex: number;
@@ -49,7 +48,9 @@ export default function PokemonDetail() {
     if (value <= 49) return "red";
     if (value <= 79) return "orange";
     if (value <= 99) return "yellow";
-    return "#7CFC00";
+    if (value <= 119) return "#7CFC00";
+    if (value <= 149) return "green";
+    return "blue";
   };
 
   if (!pokemon) return <p>Chargement...</p>;
