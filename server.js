@@ -113,5 +113,5 @@ app.get("/", (req, res) => {
 });
 
 app.listen(3001, () => {
-  console.log("✅ API en ligne sur http://localhost:3001");
+  console.log("API en ligne sur http://localhost:3001");
 });
