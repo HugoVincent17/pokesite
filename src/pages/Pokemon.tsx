@@ -9,7 +9,15 @@ type Pokemon = {
   types: string[];
   rarete: string;
   generation: number;
+  hp: number;
+  attaque: number;
+  defense: number;
+  attaque_spe: number;
+  defense_spe: number;
+  vitesse: number;
 };
+
+type StatKey = "hp" | "attaque" | "defense" | "attaque_spe" | "defense_spe" | "vitesse";
 
 export default function Pokemon() {
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
@@ -18,6 +26,7 @@ export default function Pokemon() {
   const [doubleType, setDoubleType] = useState<boolean>(true);
   const [selectedRarete, setSelectedRarete] = useState<string | null>(null);
   const [selectedGeneration, setSelectedGeneration] = useState<number | null>(null);
+  const [statFilters, setStatFilters] = useState<{ hp?: number; attaque?: number; defense?: number; attaque_spe?: number; defense_spe?: number; vitesse?: number }>({});
 
 
   useEffect(() => {
@@ -55,6 +64,15 @@ if (selectedGeneration) {
   filteredPokemons = filteredPokemons.filter(p => p.generation === selectedGeneration);
 }
 
+filteredPokemons = filteredPokemons.filter((p) =>
+  (!statFilters?.hp || (p.hp ?? 0) >= statFilters.hp) &&
+  (!statFilters?.attaque || (p.attaque ?? 0) >= statFilters.attaque) &&
+  (!statFilters?.defense || (p.defense ?? 0) >= statFilters.defense) &&
+  (!statFilters?.attaque_spe || (p.attaque_spe ?? 0) >= statFilters.attaque_spe) &&
+  (!statFilters?.defense_spe || (p.defense_spe ?? 0) >= statFilters.defense_spe) &&
+  (!statFilters?.vitesse || (p.vitesse ?? 0) >= statFilters.vitesse)
+);
+
   const toggleType = (type: string) => {
     setSelectedTypes((prev) =>
       prev.includes(type)
@@ -85,6 +103,33 @@ if (selectedGeneration) {
           marginRight: "auto"
         }}
       />
+      <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem", justifyContent: "center" }}>
+  {(["hp", "attaque", "defense", "attaque_spe", "defense_spe", "vitesse"] as StatKey[]).map((stat) => (
+    <div key={stat} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <label style={{ fontSize: "0.7rem", marginBottom: "0.2rem", textTransform: "uppercase" }}>
+        {stat === "hp" ? "PV" :
+         stat === "attaque" ? "ATTAQUE" :
+         stat === "defense" ? "DÉFENSE" :
+         stat === "attaque_spe" ? "ATTAQUE SPÉCIALE" :
+         stat === "defense_spe" ? "DÉFENSE SPÉCIALE" :
+         "VITESSE"}
+      </label>
+      <input
+        type="number"
+        min={0}
+        style={{ width: "50px", padding: "2px 4px", borderRadius: "4px", textAlign: "center" }}
+        value={statFilters[stat] || ""}
+        onChange={(e) =>
+          setStatFilters((prev) => ({
+            ...prev,
+            [stat]: e.target.value ? Number(e.target.value) : undefined,
+          }))
+        }
+      />
+    </div>
+  ))}
+</div>
+
       <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem", gap: "0.5rem" }}>
   <label>
     Génération :
@@ -114,8 +159,9 @@ if (selectedGeneration) {
 
       <div
         style={{
-          display: "flex",
+          display: "grid",
           flexWrap: "wrap",
+          gridTemplateColumns: "repeat(9, max-content)",
           justifyContent: "center",
           gap: "0.5rem",
           marginBottom: "2rem",
