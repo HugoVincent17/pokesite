@@ -229,7 +229,7 @@ filteredPokemons = filteredPokemons.filter((p) =>
                 boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
                 background: `linear-gradient(145deg, ${couleurType[mainType] || couleurType["Normal"]} 0%, #ffffff30 100%)`,
                 cursor: "pointer",
-                transition: "transform 0.3s ease, box-shadow 0.3s ease", // <-- ajout de la transition
+                transition: "transform 0.3s ease, box-shadow 0.3s ease", 
               }}
               onMouseEnter={(e) => {
                 (e.currentTarget as HTMLDivElement).style.transform = "scale(1.05)";
