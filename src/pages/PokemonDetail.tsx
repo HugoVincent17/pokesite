@@ -15,6 +15,7 @@ type Pokemon = {
   defense_spe: number;
   vitesse: number;
   rarete: string;
+  generation: number;
 };
 
 export default function PokemonDetail() {
@@ -111,5 +112,6 @@ return (
     </div>
 
     <p>Numéro Pokédex : {pokemon.num_pokedex}</p>
+    <p>Génération : {pokemon.generation}</p>
   </div>
 )};
