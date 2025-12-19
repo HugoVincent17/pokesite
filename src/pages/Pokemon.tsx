@@ -38,7 +38,6 @@ export default function Pokemon() {
       setPokemons(data);
     }
     fetchData();
-    
   }, []);
   
 
