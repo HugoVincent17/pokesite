@@ -29,7 +29,7 @@ export default function Pokemon() {
   const [selectedRarete, setSelectedRarete] = useState<string | null>(null);
   const [selectedGeneration, setSelectedGeneration] = useState<number | null>(null);
   const [statFilters, setStatFilters] = useState<{ hp?: number; attaque?: number; defense?: number; attaque_spe?: number; defense_spe?: number; vitesse?: number }>({});
-
+  const [statMode, setStatMode] = useState<boolean>(true);
 
   useEffect(() => {
     async function fetchData() {
@@ -65,15 +65,30 @@ if (selectedGeneration) {
   filteredPokemons = filteredPokemons.filter(p => p.generation === selectedGeneration);
 }// filtre par génération
 
-filteredPokemons = filteredPokemons.filter((p) =>
-  (!statFilters?.hp || (p.hp ?? 0) >= statFilters.hp) &&
-  (!statFilters?.attaque || (p.attaque ?? 0) >= statFilters.attaque) &&
-  (!statFilters?.defense || (p.defense ?? 0) >= statFilters.defense) &&
-  (!statFilters?.attaque_spe || (p.attaque_spe ?? 0) >= statFilters.attaque_spe) &&
-  (!statFilters?.defense_spe || (p.defense_spe ?? 0) >= statFilters.defense_spe) &&
-  (!statFilters?.vitesse || (p.vitesse ?? 0) >= statFilters.vitesse)
-);// filtre par stats
-
+if (Object.values(statFilters).some((val) => val !== undefined)) {
+  filteredPokemons = filteredPokemons.filter((p) => {
+    if (statMode) {
+      // Mode ET : Toutes les stats doivent correspondre
+      return (
+        (!statFilters.hp || (p.hp ?? 0) >= statFilters.hp) &&
+        (!statFilters.attaque || (p.attaque ?? 0) >= statFilters.attaque) &&
+        (!statFilters.defense || (p.defense ?? 0) >= statFilters.defense) &&
+        (!statFilters.attaque_spe || (p.attaque_spe ?? 0) >= statFilters.attaque_spe) &&
+        (!statFilters.defense_spe || (p.defense_spe ?? 0) >= statFilters.defense_spe) &&
+        (!statFilters.vitesse || (p.vitesse ?? 0) >= statFilters.vitesse)
+      );
+    } else {
+      // Mode OU : Au moins une stat doit correspondre
+      return (
+        (statFilters.hp && (p.hp ?? 0) >= statFilters.hp) ||
+        (statFilters.attaque && (p.attaque ?? 0) >= statFilters.attaque) ||
+        (statFilters.defense && (p.defense ?? 0) >= statFilters.defense) ||
+        (statFilters.attaque_spe && (p.attaque_spe ?? 0) >= statFilters.attaque_spe) ||
+        (statFilters.defense_spe && (p.defense_spe ?? 0) >= statFilters.defense_spe) ||
+        (statFilters.vitesse && (p.vitesse ?? 0) >= statFilters.vitesse)
+      );
+    }
+  });}
   const toggleType = (type: string) => {
     setSelectedTypes((prev) =>
       prev.includes(type)
@@ -131,6 +146,17 @@ filteredPokemons = filteredPokemons.filter((p) =>
   ))}
 </div>
 
+<div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}>
+  <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", cursor: "pointer" }}>
+    <input
+      type="checkbox"
+      checked={statMode}
+      onChange={() => setStatMode(!statMode)}
+    />
+    <strong>{statMode ? "Stats combinées" : "Au moins une stat"}</strong>
+  </label>
+</div>
+
       <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem", gap: "0.5rem" }}>
   <label>
     Génération :
@@ -154,7 +180,7 @@ filteredPokemons = filteredPokemons.filter((p) =>
       checked={doubleType}
       onChange={() => setDoubleType(!doubleType)}
     />
-    <strong>Double Type</strong>
+    <strong>{doubleType ? "Double Type" : "Au moins un type"}</strong>
   </label>
 </div>{/* toggle pour double type */}
 
