@@ -57,7 +57,6 @@ export default function Pokemon() {// composant principal
   
     setSearchParams(params);
   }, [search, selectedTypes, doubleType, selectedRarete, selectedGeneration, statFilters, statMode]);// synchronisation des paramètres de l'URL avec les états de filtrage
-  
 
   useEffect(() => {
     async function fetchData() {
