@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState} from "react";
 import { Link } from "react-router-dom";
 import { couleurType, couleurRarete } from "../parametres.ts";
+import { useSearchParams } from "react-router-dom";
 
 //type pokémon
 type Pokemon = {
@@ -21,15 +22,42 @@ type Pokemon = {
 type StatKey = "hp" | "attaque" | "defense" | "attaque_spe" | "defense_spe" | "vitesse"; //type pour les stats
 
 //fonction pokemon useState et useEffect 
-export default function Pokemon() {
-  const [pokemons, setPokemons] = useState<Pokemon[]>([]);
-  const [search, setSearch] = useState("");
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
-  const [doubleType, setDoubleType] = useState<boolean>(true);
-  const [selectedRarete, setSelectedRarete] = useState<string | null>(null);
-  const [selectedGeneration, setSelectedGeneration] = useState<number | null>(null);
-  const [statFilters, setStatFilters] = useState<{ hp?: number; attaque?: number; defense?: number; attaque_spe?: number; defense_spe?: number; vitesse?: number }>({});
-  const [statMode, setStatMode] = useState<boolean>(true);
+export default function Pokemon() {// composant principal
+  const [searchParams, setSearchParams] = useSearchParams();// gestion des paramètres de l'URL
+  const [pokemons, setPokemons] = useState<Pokemon[]>([]);// état pour la liste des pokémons
+  const [search, setSearch] = useState(searchParams.get("search") || "");// état pour la recherche par nom
+  const [selectedTypes, setSelectedTypes] = useState<string[]>(searchParams.get("types")?.split(",") || []);// état pour les types sélectionnés
+  const [doubleType, setDoubleType] = useState(searchParams.get("doubleType") === "true");// état pour le mode double type
+  const [selectedRarete, setSelectedRarete] = useState(searchParams.get("rarete") || null);// état pour la rareté sélectionnée
+  const [selectedGeneration, setSelectedGeneration] = useState(searchParams.get("generation") ? Number(searchParams.get("generation")) : null);// état pour la génération sélectionnée
+  const [statFilters, setStatFilters] = useState<{ [key in StatKey]?: number }>({
+    hp: searchParams.get("hp") ? Number(searchParams.get("hp")) : undefined,
+    attaque: searchParams.get("attaque") ? Number(searchParams.get("attaque")) : undefined,
+    defense: searchParams.get("defense") ? Number(searchParams.get("defense")) : undefined,
+    attaque_spe: searchParams.get("attaque_spe") ? Number(searchParams.get("attaque_spe")) : undefined,
+    defense_spe: searchParams.get("defense_spe") ? Number(searchParams.get("defense_spe")) : undefined,
+    vitesse: searchParams.get("vitesse") ? Number(searchParams.get("vitesse")) : undefined,
+  });// état pour les filtres de stats
+  const [statMode, setStatMode] = useState(searchParams.get("statMode") !== "false");
+  // synchronisation des états de filtrage avec les paramètres de l'URL
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (search) params.set("search", search);
+    if (selectedTypes.length > 0) params.set("types", selectedTypes.join(","));
+    params.set("doubleType", String(doubleType));
+    if (selectedRarete) params.set("rarete", selectedRarete);
+    if (selectedGeneration) params.set("generation", String(selectedGeneration));
+    if (statFilters.hp) params.set("hp", String(statFilters.hp));
+    if (statFilters.attaque) params.set("attaque", String(statFilters.attaque));
+    if (statFilters.defense) params.set("defense", String(statFilters.defense));
+    if (statFilters.attaque_spe) params.set("attaque_spe", String(statFilters.attaque_spe));
+    if (statFilters.defense_spe) params.set("defense_spe", String(statFilters.defense_spe));
+    if (statFilters.vitesse) params.set("vitesse", String(statFilters.vitesse));
+    params.set("statMode", String(statMode));// mise à jour des paramètres de l'URL
+  
+    setSearchParams(params);
+  }, [search, selectedTypes, doubleType, selectedRarete, selectedGeneration, statFilters, statMode]);// synchronisation des paramètres de l'URL avec les états de filtrage
+  
 
   useEffect(() => {
     async function fetchData() {
@@ -38,7 +66,7 @@ export default function Pokemon() {
       setPokemons(data);
     }
     fetchData();
-  }, []);
+  }, []);// récupération des données des pokémons
   
 
   const allTypes = Array.from(
@@ -87,15 +115,16 @@ if (Object.values(statFilters).some((val) => val !== undefined)) {
         (statFilters.defense_spe && (p.defense_spe ?? 0) >= statFilters.defense_spe) ||
         (statFilters.vitesse && (p.vitesse ?? 0) >= statFilters.vitesse)
       );
-    }
+    }// filtre par stats
   });}
   const toggleType = (type: string) => {
     setSelectedTypes((prev) =>
       prev.includes(type)
         ? prev.filter((t) => t !== type) 
         : [...prev, type] 
-    );
-  };// fonction pour sélectionner/désélectionner un type
+    );// fonction pour sélectionner/désélectionner un type
+
+  }
 
   return (
     
@@ -155,7 +184,7 @@ if (Object.values(statFilters).some((val) => val !== undefined)) {
     />
     <strong>{statMode ? "Stats combinées" : "Au moins une stat"}</strong>
   </label>
-</div>
+</div>{/* toggle pour le mode des stats */}
 
       <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem", gap: "0.5rem" }}>
   <label>
