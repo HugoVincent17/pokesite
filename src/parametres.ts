@@ -1,9 +1,11 @@
 export const couleurRarete: { [key: string]: string } = {
     Légendaire: "#FFBF2A",     // vrai or
-    Fabuleux: "#C0C0C0",       // silver mystique
+    Fabuleux: "#BB86FC",      // violet clair
     Surpuissant: "#FF7500",    // orange “jeune”, moins saturé
-    Starter: "#FFBC99",          // rouge moins fort
-    Fossile: "#D2B48C"        // marron clair
+    Starter: "#00FF00",       // vert vif
+    Fossile: "#D2B48C" ,       // marron clair
+    Chimère: "#FF2C00",      // rouge vif
+    Paradoxe: "#009999",     // cyan
   };
 
   export const couleurType: { [key: string]: string } = {
@@ -26,3 +28,4 @@ export const couleurRarete: { [key: string]: string } = {
     Fée: "#EE99AC",
     Normal: "#A8A878",
   };
+
