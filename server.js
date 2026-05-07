@@ -69,7 +69,7 @@ app.get("/pokemon", async (req, res) => {
 app.get("/pokemon/:id", async (req, res) => {
   try {
     const [rows] = await db.query(
-      `SELECT p.num_pokedex, p.nom, p.img, p.img_shiny, p.hp,
+      `SELECT p.num_pokedex, p.nom, p.img, p.img_shiny, p.img_mini, p.hp,
        p.attaque, p.defense, p.attaque_spe, p.defense_spe, 
        p.vitesse, p.generation, p.rarete, p.taux_capture, t.nom AS nom_type
        FROM pokemon p
@@ -90,6 +90,7 @@ app.get("/pokemon/:id", async (req, res) => {
       nom: rows[0].nom,
       img: rows[0].img,
       img_shiny: rows[0].img_shiny,
+      img_mini: rows[0].img_mini,
       hp: rows[0].hp,
       attaque: rows[0].attaque,
       defense: rows[0].defense,
