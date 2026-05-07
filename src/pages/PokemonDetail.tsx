@@ -1,12 +1,14 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { couleurType, couleurRarete } from "../parametres.ts";
 
+// Ajout du taux_capture dans le type
 type Pokemon = {
   num_pokedex: number;
   nom: string;
   img: string;
   img_shiny: string;
+  img_mini: string;
   types: string[];
   hp: number;
   attaque: number;
@@ -16,102 +18,148 @@ type Pokemon = {
   vitesse: number;
   rarete: string;
   generation: number;
+  taux_capture: number;
 };
 
 export default function PokemonDetail() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [pokemon, setPokemon] = useState<Pokemon | null>(null);
 
   useEffect(() => {
-    async function fetchPokemon() {
-      try {
-        const res = await fetch(`http://localhost:3001/pokemon/${id}`);
-        const data = await res.json();
-        setPokemon(data);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-    fetchPokemon();
+    fetch(`http://localhost:3001/pokemon/${id}`)
+      .then(res => res.json())
+      .then(data => setPokemon(data))
+      .catch(err => console.error(err));
   }, [id]);
 
+  if (!pokemon) return <div style={{ color: "white", textAlign: "center", padding: "5rem" }}>Chargement...</div>;
+
+  const mainType = pokemon.types[0] || "Normal";
+  
   const stats = [
-    { label: "PV", value: pokemon?.hp },
-    { label: "ATTAQUE", value: pokemon?.attaque },
-    { label: "DÉFENSE", value: pokemon?.defense },
-    { label: "ATTAQUE SPÉCIALE", value: pokemon?.attaque_spe },
-    { label: "DÉFENSE SPÉCIALE", value: pokemon?.defense_spe },
-    { label: "VITESSE", value: pokemon?.vitesse },
+    { label: "PV", val: pokemon.hp, max: 255 },
+    { label: "Attaque", val: pokemon.attaque, max: 255 },
+    { label: "Défense", val: pokemon.defense, max: 255 },
+    { label: "Attaque Spéciale", val: pokemon.attaque_spe, max: 255 },
+    { label: "Défense Spéciale", val: pokemon.defense_spe, max: 255 },
+    { label: "Vitesse", val: pokemon.vitesse, max: 255 },
   ];
-  
-  
-  const getStatColor = (value: number) => {
-    if (value <= 49) return "red";
-    if (value <= 79) return "orange";
-    if (value <= 99) return "yellow";
-    if (value <= 119) return "#7CFC00";
-    if (value <= 149) return "green";
-    return "blue";
+
+  const getStatColor = (val: number) => {
+    if (val < 40) return "#ff4d4d";
+    if (val < 60) return "#f06f11";
+    if (val < 80) return "#ffcc00";
+    if (val < 100) return "#33ee33";
+    if (val < 120) return "#007700";
+    if (val < 150) return "#00bbff";
+    return "#0066ff";
   };
 
-  if (!pokemon) return <p>Chargement...</p>;
-
-const mainType = pokemon.types[0] || "Normal";
-return (
-  <div
-    style={{
-      textAlign: "center",
-      padding: "2rem",
-      background: `linear-gradient(145deg, ${couleurType[mainType]} 0%, #ffffff30 100%)`,
-      borderRadius: "16px",
-    }}
-  >
-    <h1
-      style={{
-        fontWeight: "bold",
-        color: couleurRarete[pokemon.rarete] || "white"
-      }}
-    >
-      {pokemon.nom}
-    </h1>
-
-    <div style={{ display: "flex", justifyContent: "center", gap: "2rem", alignItems: "center" }}>
-      <div>
-        <p>Normal</p>
-        <img src={pokemon.img} alt={`${pokemon.nom} normal`} style={{ maxWidth: "300px", height: "auto" }} />
+  return (
+    <div style={{ 
+      maxWidth: "1000px", 
+      margin: "2rem auto", 
+      background: "#1a1a1a", 
+      borderRadius: "20px", 
+      overflow: "hidden", 
+      boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+      color: "white",
+      fontFamily: "sans-serif",
+      border: `2px solid ${couleurType[mainType]}`
+    }}>
+      {/* Header avec bouton retour */}
+      <div style={{ display: "flex", alignItems: "center", padding: "1rem", background: `linear-gradient(90deg, ${couleurType[mainType]}99, transparent)` }}>
+        <button onClick={() => navigate(-1)} style={{ background: "none", border: "none", color: "white", cursor: "pointer", fontSize: "1.5rem", marginRight: "1rem" }}>←</button>
+        <img src={pokemon.img_mini} alt="mini" style={{ width: "40px", marginRight: "10px" }} />
+        <h1 style={{ margin: 0, fontSize: "1.8rem" || "white" }}>
+          #{pokemon.num_pokedex} - {pokemon.nom}
+        </h1>
       </div>
-      <div>
-        <p>Shiny</p>
-        <img src={pokemon.img_shiny} alt={`${pokemon.nom} shiny`} style={{ maxWidth: "300px", height: "auto" }} />
+
+      <div style={{ 
+        display: "grid", 
+        gridTemplateColumns: "1fr 1.2fr 0.8fr", 
+        gap: "1.5rem", 
+        padding: "1.5rem",
+        alignItems: "start"
+      }}>
+        
+        {/* COLONNE 1 : VISUELS */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <div style={{ flex: 1, background: "#2a2a2a", borderRadius: "15px", padding: "10px", textAlign: "center" }}>
+            <span style={{ fontSize: "0.8rem", color: "#aaa" }}>NORMAL</span>
+            <img src={pokemon.img} alt="normal" style={{ width: "100%", height: "auto" }} />
+          </div>
+          <div style={{ background: "#2a2a2a", borderRadius: "15px", padding: "10px", textAlign: "center" }}>
+            <span style={{ fontSize: "0.8rem", color: "#aaa" }}>SHINY</span>
+            <img src={pokemon.img_shiny} alt="shiny" style={{ width: "100%", height: "auto" }} />
+          </div>
+        </div>
+
+        {/* COLONNE 2 : STATS (Style Coup Critique) */}
+        <div style={{ background: "#252525", padding: "1.5rem", borderRadius: "15px", display: "flex", flexDirection: "column", justifyContent:"space-between" }}>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: "15px" }}>
+          <h3 style={{ marginTop: 0, borderBottom: "1px solid #444", paddingBottom: "5px" }}>Statistiques de base</h3>
+          {stats.map(s => (
+            <div key={s.label} style={{ marginBottom: "12px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.9rem", marginBottom: "4px" }}>
+                <span>{s.label}</span>
+                <span style={{ fontWeight: "bold" }}>{s.val}</span>
+              </div>
+              <div style={{ height: "8px", background: "#444", borderRadius: "4px" }}>
+                <div style={{ 
+                  width: `${(s.val / s.max) * 100}%`, 
+                  height: "100%", 
+                  background: getStatColor(s.val), 
+                  borderRadius: "4px",
+                  transition: "width 0.5s ease"
+                }} />
+              </div>
+            </div>
+          ))}
+          </div>
+          <div style={{ marginTop: "1rem", textAlign: "center", fontSize: "0.9rem", color: "#888" }}>
+            Total : {pokemon.hp + pokemon.attaque + pokemon.defense + pokemon.attaque_spe + pokemon.defense_spe + pokemon.vitesse}
+          </div>
+        </div>
+
+        {/* COLONNE 3 : INFOS TECHNIQUES */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <div style={{ background: "#252525", padding: "1rem", borderRadius: "15px" }}>
+            <h3 style={{ marginTop: 0, fontSize: "1rem" }}>Types</h3>
+            <div style={{ display: "flex", gap: "5px" }}>
+              {pokemon.types.map(t => (
+                <span key={t} style={{ 
+                  background: couleurType[t], 
+                  padding: "5px 10px", 
+                  borderRadius: "5px", 
+                  fontSize: "0.8rem",
+                  fontWeight: "bold",
+                  color: ["Sol", "Électrik", "Glace", "Plante", "Normal", "Acier"].includes(t) ? "black" : "white", 
+                }}>{t}</span>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ background: "#252525", padding: "1rem", borderRadius: "15px", fontSize: "0.9rem" }}>
+            <p><strong>Génération :</strong> {pokemon.generation}</p>
+            <p><strong>Taux de capture :</strong> {pokemon.taux_capture}</p>
+            <p>Pokémon <span style={{ color: couleurRarete[pokemon.rarete] }}>{pokemon.rarete}</span></p>  
+          </div>
+
+          <div style={{ 
+            background: `linear-gradient(45deg, #222, ${couleurType[mainType]}44)`, 
+            padding: "1rem", 
+            borderRadius: "15px", 
+            textAlign: "center" 
+          }}>
+            <p style={{ margin: 0, fontSize: "0.8rem", color: "#ccc" }}>Pokédex</p>
+            <p style={{ fontSize: "1.5rem", margin: "5px 0", fontWeight: "bold" }}>N° {pokemon.num_pokedex}</p>
+          </div>
+        </div>
+
       </div>
     </div>
-
-    <div style={{ display: "flex", justifyContent: "center", gap: "1rem", marginTop: "1rem", flexWrap: "wrap" }}>
-  {stats.map((stat) => (
-    <div key={stat.label} style={{ textAlign: "center", minWidth: "80px" }}>
-      <p style={{ fontWeight: "bold" }}>{stat.label}</p>
-      <p style={{ color: getStatColor(stat.value ?? 0), fontWeight: "bold", fontSize: "1.2rem" }}>{stat.value}</p>
-    </div>
-  ))}
-</div>
-    <div style={{ display: "flex", justifyContent: "center", gap: "8px", marginTop: "1rem" }}>
-      {pokemon.types.map(t => (
-        <span
-          key={t}
-          style={{
-            padding: "4px 8px",
-            borderRadius: "8px",
-            background: couleurType[t],
-            color: ["Sol", "Électrik", "Glace", "Plante", "Normal", "Acier"].includes(t) ? "black" : "white",
-            fontWeight: "bold",
-          }}
-        >
-          {t}
-        </span>
-      ))}
-    </div>
-
-    <p>Numéro Pokédex : {pokemon.num_pokedex}</p>
-    <p>Génération : {pokemon.generation}</p>
-  </div>
-)};
+  );
+}
