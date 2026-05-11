@@ -1,9 +1,6 @@
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
+
+
 
 
 CREATE TABLE acceder (
@@ -2841,6 +2838,16 @@ CREATE TABLE utiliser (
   id_objet int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+CREATE TABLE associer (
+  id_talent int(11) NOT NULL,
+  id_type int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE apparaitre (
+  num_pokedex int(11) NOT NULL,
+  id_talent int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 
 ALTER TABLE acceder
   ADD PRIMARY KEY (num_pokedex,id_meca),
@@ -2908,6 +2915,13 @@ ALTER TABLE utiliser
   ADD PRIMARY KEY (num_pokedex,id_objet),
   ADD KEY id_objet (id_objet);
 
+ALTER TABLE associer
+  ADD PRIMARY KEY (id_talent,id_type),
+  ADD KEY id_type (id_type);
+
+ALTER TABLE apparaitre
+  ADD PRIMARY KEY (num_pokedex,id_talent),
+  ADD KEY id_type (id_talent);
 
 ALTER TABLE acceder
   ADD CONSTRAINT acceder_ibfk_1 FOREIGN KEY (num_pokedex) REFERENCES pokemon (num_pokedex),
@@ -2941,12 +2955,16 @@ ALTER TABLE mecanique
 
 ALTER TABLE posseder
   ADD CONSTRAINT posseder_ibfk_1 FOREIGN KEY (num_pokedex) REFERENCES pokemon (num_pokedex),
-  ADD CONSTRAINT posseder_ibfk_2 FOREIGN KEY (id_type) REFERENCES `types` (id_type);
+  ADD CONSTRAINT posseder_ibfk_2 FOREIGN KEY (id_type) REFERENCES types (id_type);
 
 ALTER TABLE utiliser
   ADD CONSTRAINT utiliser_ibfk_1 FOREIGN KEY (num_pokedex) REFERENCES pokemon (num_pokedex),
   ADD CONSTRAINT utiliser_ibfk_2 FOREIGN KEY (id_objet) REFERENCES objet (id_objet);
 
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+ALTER TABLE associer
+  ADD CONSTRAINT associer_ibfk_1 FOREIGN KEY (id_talent) REFERENCES talents (id_talent),
+  ADD CONSTRAINT associer_ibfk_2 FOREIGN KEY (id_type) REFERENCES types (id_type);
+
+ALTER TABLE apparaitre
+  ADD CONSTRAINT apparaitre_ibfk_1 FOREIGN KEY (num_pokedex) REFERENCES pokemon (num_pokedex),
+  ADD CONSTRAINT apparaitre_ibfk_2 FOREIGN KEY (id_talent) REFERENCES talents (id_talent);
