@@ -5,7 +5,7 @@ export const couleurRarete: { [key: string]: string } = {
     Starter: "#00FF00",       // vert vif
     Fossile: "#D2B48C" ,       // marron clair
     Chimère: "#FF2C00",      // rouge vif
-    Paradoxe: "#009999",     // cyan
+    Paradoxe: "#009999",
   };
 
   export const couleurType: { [key: string]: string } = {
