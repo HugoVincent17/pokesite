@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { couleurType, couleurRarete } from "../parametres.ts";
+import { couleurType, couleurRarete, tableTypes } from "../parametres.ts";
 
 // Ajout du taux_capture dans le type
 type Pokemon = {
@@ -55,6 +55,34 @@ export default function PokemonDetail() {
     if (val < 150) return "#00bbff";
     return "#0066ff";
   };
+
+  const calculerAffinites = () => {
+    if (!pokemon) return { faiblesses: [], resistances: [], immunites: [] };
+    
+    const faiblesses: [string, number][] = [];
+    const resistances: [string, number][] = [];
+    const immunites: string[] = [];
+  
+    Object.keys(tableTypes).forEach((typeAttaquant) => {
+      let score = 1;
+      pokemon.types.forEach((typeDefenseur) => {
+        const mod = tableTypes[typeAttaquant][typeDefenseur] ?? 1;
+        score *= mod;
+      });
+  
+      if (score === 0) {
+        immunites.push(typeAttaquant);
+      } else if (score > 1) {
+        faiblesses.push([typeAttaquant, score]);
+      } else if (score < 1) {
+        resistances.push([typeAttaquant, score]);
+      }
+    });
+  
+    return { faiblesses, resistances, immunites };
+  };
+  
+  const { faiblesses, resistances, immunites } = calculerAffinites();
 
   return (
     <div style={{ 
@@ -142,6 +170,60 @@ export default function PokemonDetail() {
             </div>
           </div>
 
+          <div style={{ marginTop: "2rem", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+  
+  {/* SECTION FAIBLESSES */}
+  {faiblesses.length > 0 && (
+    <div>
+      <h3 style={{ color: "#888", fontSize: "0.8rem", marginBottom: "0.8rem" }}>FAIBLESSES</h3>
+      <div style={{ display: "flex", gap: "5px", flexWrap: "wrap" }}>
+        {faiblesses.map(([type, mult]) => (
+          <div key={type} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <span style={{ background: couleurType[type], color: ["Sol", "Électrik", "Glace", "Plante", "Normal", "Acier"].includes(type.trim()) ? "black" : "white", padding: "5px 10px", borderRadius: "5px", fontWeight: "bold", fontSize: "0.8rem" }}>
+              {type}
+            </span>
+            <span style={{ color: "#ffaa00", fontWeight: "bold" }}>x{mult}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+
+  {/* SECTION RÉSISTANCES */}
+  {resistances.length > 0 && (
+    <div>
+      <h3 style={{ color: "#888", fontSize: "0.8rem", marginBottom: "0.8rem" }}>RÉSISTANCES</h3>
+      <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+        {resistances.map(([type, mult]) => (
+          <div key={type} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <span style={{ background: couleurType[type], color: "#000", padding: "5px 12px", borderRadius: "6px", fontWeight: "bold", fontSize: "0.9rem" }}>
+              {type}
+            </span>
+            <span style={{ color: "#ffaa00", fontWeight: "bold" }}>x{mult}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+
+  {/* SECTION IMMUNITÉS */}
+  {immunites.length > 0 && (
+    <div>
+      <h3 style={{ color: "#888", fontSize: "0.8rem", marginBottom: "0.8rem" }}>IMMUNITÉS</h3>
+      <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+        {immunites.map((type) => (
+          <div key={type} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <span style={{ background: couleurType[type], color: "#000", padding: "5px 12px", borderRadius: "6px", fontWeight: "bold", fontSize: "0.9rem" }}>
+              {type}
+            </span>
+            <span style={{ color: "#ffaa00", fontWeight: "bold" }}>Immunisé</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+
+</div>
           <div style={{ background: "#252525", padding: "1rem", borderRadius: "15px", fontSize: "0.9rem" }}>
             <p><strong>Génération :</strong> {pokemon.generation}</p>
             <p><strong>Taux de capture :</strong> {pokemon.taux_capture}</p>
@@ -158,7 +240,7 @@ export default function PokemonDetail() {
             <p style={{ fontSize: "1.5rem", margin: "5px 0", fontWeight: "bold" }}>N° {pokemon.num_pokedex}</p>
           </div>
         </div>
-
+          
       </div>
     </div>
   );
