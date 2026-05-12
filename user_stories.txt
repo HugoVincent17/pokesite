@@ -1,8 +1,15 @@
 User stories
 
 En tant qu'utilisateur je peux consulter tous les Pokémons des jeux
-En tant qu'utilisateur je peux trier en utilisant des critères de tri ou en utilisant la barre de recherche
-En tant qu'utilisateur, je peux consulter la fiche d'un pokémon
+En tant qu'utilisateur je peux trier en utilisant des critères de tri 
+En tant qu'utilisateur je peux rechercher un pokémon dans la barre de recherche
+En tant qu'utilisateur, je peux consulter la fiche de détails d'un pokémon
+
+
+
+
+//////////////
+
 
 En tant qu'utilisateur, je peux consulter tous les objets des jeux, par défaut, en utilisant des critères de tri ou en utilisant la barre de recherche
 En tant qu'utilisateur, je peux consulter la fiche d'un objet
@@ -19,7 +26,6 @@ En tant qu'utilisateur, je peux consulter la fiche d'une mécanique
 En tant qu'utilisateur, je peux consulter tous les changements de statut des jeux, par défaut ou en utilisant la barre de recherche
 En tant qu'utilisateur, je peux consulter la fiche d'un statut
 
-En tant qu'utilisateur, je peux répondre à un quiz pokémon (et gagner une récompense)
 
 
 
