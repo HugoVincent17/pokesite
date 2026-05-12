@@ -68,39 +68,38 @@ app.get("/pokemon", async (req, res) => {
 
 app.get("/pokemon/:id", async (req, res) => {
   try {
+    const pokemonId = req.params.id;
+
+    // 1. On récupère le Pokémon et ses types
     const [rows] = await db.query(
-      `SELECT p.num_pokedex, p.nom, p.img, p.img_shiny, p.img_mini, p.hp,
-       p.attaque, p.defense, p.attaque_spe, p.defense_spe, 
-       p.vitesse, p.generation, p.rarete, p.taux_capture, t.nom AS nom_type
+      `SELECT p.*, t.nom AS nom_type
        FROM pokemon p
        LEFT JOIN posseder po ON p.num_pokedex = po.num_pokedex
        LEFT JOIN types t ON t.id_type = po.id_type
        WHERE p.num_pokedex = ?
        ORDER BY po.type_ordre`,
-      [req.params.id]
-    );{/*route pour la page pokemondetail*/}
+      [pokemonId]
+    );
 
     if (!rows.length) return res.status(404).json({ error: "Introuvable" });
 
-    // Regrouper les types
+    // 2. NOUVEAU : On récupère les talents associés
+    const [talentRows] = await db.query(
+      `SELECT t.nom, t.description_talent
+       FROM talents t
+       JOIN detenir d ON t.id_talent = d.id_talent
+       WHERE d.num_pokedex = ?`,
+      [pokemonId]
+    );
+
+    // Regrouper les types (ton code actuel)
     const types = rows.map(r => r.nom_type).filter(Boolean);
 
+    // Construire l'objet final
     const pokemon = {
-      num_pokedex: rows[0].num_pokedex,
-      nom: rows[0].nom,
-      img: rows[0].img,
-      img_shiny: rows[0].img_shiny,
-      img_mini: rows[0].img_mini,
-      hp: rows[0].hp,
-      attaque: rows[0].attaque,
-      defense: rows[0].defense,
-      attaque_spe: rows[0].attaque_spe,
-      defense_spe: rows[0].defense_spe,
-      vitesse: rows[0].vitesse,
-      rarete: rows[0].rarete,
-      generation: rows[0].generation,
-      taux_capture: rows[0].taux_capture,
-      types
+      ...rows[0], // On récupère toutes les propriétés de base (hp, attaque, etc.)
+      types,
+      talents: talentRows // On ajoute le tableau des talents (nom + description)
     };
 
     res.json(pokemon);
@@ -111,7 +110,6 @@ app.get("/pokemon/:id", async (req, res) => {
 });
 
 
-
 app.get("/", (req, res) => {
   res.send("API Pokédex en ligne");
 });
@@ -119,3 +117,5 @@ app.get("/", (req, res) => {
 app.listen(3001, () => {
   console.log("API en ligne sur http://localhost:3001");
 });
+
+export default app;
