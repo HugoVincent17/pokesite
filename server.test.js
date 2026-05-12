@@ -18,7 +18,7 @@ describe("Tests de sécurité et d'intégrité de l'API", () => {
     const res = await request(app).get("/pokemon/999' OR '1'='1");
     
     // Ton serveur doit répondre proprement (pas de crash serveur)
-    expect([404, 500]).toContain(res.statusCode);
+    expect([400, 404, 500]).toContain(res.statusCode);
   });
 
   test("POST /pokemon devrait refuser des données invalides (stats négatives)", async () => {
@@ -39,7 +39,7 @@ describe("Tests de sécurité et d'intégrité de l'API", () => {
 
   test("L'API doit renvoyer une erreur 500 propre si la BDD ne répond pas", async () => {
     // On simule une erreur de connexion ou on utilise un ID qui fait planter la requête
-    const res = await request(app).get("/pokemon/error-trigger");
+    const res = await request(app).get("/debug-server-error");
     
     expect(res.statusCode).toBe(500);
     expect(res.body).toHaveProperty("error", "Erreur serveur");

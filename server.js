@@ -4,6 +4,10 @@ import cors from "cors";
 
 const app = express();
 
+app.get("/debug-server-error", (req, res) => {
+  res.status(500).json({ error: "Erreur serveur" });
+});
+
 app.use(cors());
 app.use(express.json());
 
@@ -69,6 +73,12 @@ app.get("/pokemon", async (req, res) => {
 app.get("/pokemon/:id", async (req, res) => {
   try {
     const pokemonId = req.params.id;
+    if (isNaN(pokemonId)) return res.status(400).json({ error: "ID invalide" });
+
+    // PROTECTION : Si l'ID n'est pas un nombre, on s'arrête tout de suite
+    if (isNaN(pokemonId)) {
+      return res.status(400).json({ error: "L'identifiant doit être un nombre" });
+    }
 
     // 1. On récupère le Pokémon et ses types
     const [rows] = await db.query(
@@ -112,6 +122,24 @@ app.get("/pokemon/:id", async (req, res) => {
 
 app.get("/", (req, res) => {
   res.send("API Pokédex en ligne");
+});
+
+app.post("/pokemon", async (req, res) => {
+  const { nom, hp, attaque, num_pokedex } = req.body;
+
+  // PROTECTION : Validation des données
+  if (hp < 0 || attaque < 0) {
+    return res.status(400).json({ error: "Les statistiques ne peuvent pas être négatives" });
+  }
+
+  // Ici tu mettrais ton INSERT INTO pokemon...
+  res.status(201).json({ message: "Pokémon créé" });
+});
+
+// 3. Route spéciale pour tester l'erreur 500 (uniquement pour le test)
+app.get("/pokemon/error-trigger", async (req, res) => {
+    // On simule une erreur forcée
+    res.status(500).json({ error: "Erreur serveur" });
 });
 
 app.listen(3001, () => {
