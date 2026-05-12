@@ -3137,10 +3137,6 @@ CREATE TABLE utiliser (
   id_objet int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE associer (
-  id_talent int(11) NOT NULL,
-  id_type int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE detenir (
   num_pokedex int(11) NOT NULL,
@@ -3210,9 +3206,6 @@ ALTER TABLE utiliser
   ADD PRIMARY KEY (num_pokedex,id_objet),
   ADD KEY id_objet (id_objet);
 
-ALTER TABLE associer
-  ADD PRIMARY KEY (id_talent,id_type),
-  ADD KEY id_type (id_type);
 
 ALTER TABLE detenir
   ADD PRIMARY KEY (num_pokedex,id_talent),
@@ -3252,10 +3245,6 @@ ALTER TABLE posseder
 ALTER TABLE utiliser
   ADD CONSTRAINT utiliser_ibfk_1 FOREIGN KEY (num_pokedex) REFERENCES pokemon (num_pokedex),
   ADD CONSTRAINT utiliser_ibfk_2 FOREIGN KEY (id_objet) REFERENCES objet (id_objet);
-
-ALTER TABLE associer
-  ADD CONSTRAINT associer_ibfk_1 FOREIGN KEY (id_talent) REFERENCES talents (id_talent),
-  ADD CONSTRAINT associer_ibfk_2 FOREIGN KEY (id_type) REFERENCES types (id_type);
 
 ALTER TABLE detenir
   ADD CONSTRAINT detenir_ibfk_1 FOREIGN KEY (num_pokedex) REFERENCES pokemon (num_pokedex),
