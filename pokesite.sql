@@ -34,10 +34,6 @@ CREATE TABLE donne (
   id_statut int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE détenir (
-  num_pokedex int(11) NOT NULL,
-  id_talent int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE inflige (
   id_attaque int(11) NOT NULL,
@@ -2804,7 +2800,7 @@ CREATE TABLE statut (
 CREATE TABLE talents (
   id_talent int(11) NOT NULL,
   nom varchar(50) NOT NULL,
-  description_talent varchar(10000)
+  description_talent varchar(10000) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO talents (id_talent, nom, description_talent) VALUES
@@ -3146,7 +3142,7 @@ CREATE TABLE associer (
   id_type int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE apparaitre (
+CREATE TABLE detenir (
   num_pokedex int(11) NOT NULL,
   id_talent int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -3172,9 +3168,6 @@ ALTER TABLE donne
   ADD PRIMARY KEY (id_objet,id_statut),
   ADD KEY id_statut (id_statut);
 
-ALTER TABLE détenir
-  ADD PRIMARY KEY (num_pokedex,id_talent),
-  ADD KEY id_talent (id_talent);
 
 ALTER TABLE inflige
   ADD PRIMARY KEY (id_attaque,id_statut),
@@ -3221,7 +3214,7 @@ ALTER TABLE associer
   ADD PRIMARY KEY (id_talent,id_type),
   ADD KEY id_type (id_type);
 
-ALTER TABLE apparaitre
+ALTER TABLE detenir
   ADD PRIMARY KEY (num_pokedex,id_talent),
   ADD KEY id_type (id_talent);
 
@@ -3244,9 +3237,6 @@ ALTER TABLE donne
   ADD CONSTRAINT donne_ibfk_1 FOREIGN KEY (id_objet) REFERENCES objet (id_objet),
   ADD CONSTRAINT donne_ibfk_2 FOREIGN KEY (id_statut) REFERENCES statut (id_statut);
 
-ALTER TABLE détenir
-  ADD CONSTRAINT détenir_ibfk_1 FOREIGN KEY (num_pokedex) REFERENCES pokemon (num_pokedex),
-  ADD CONSTRAINT détenir_ibfk_2 FOREIGN KEY (id_talent) REFERENCES talents (id_talent);
 
 ALTER TABLE inflige
   ADD CONSTRAINT inflige_ibfk_1 FOREIGN KEY (id_attaque) REFERENCES attaques (id_attaque),
@@ -3267,6 +3257,6 @@ ALTER TABLE associer
   ADD CONSTRAINT associer_ibfk_1 FOREIGN KEY (id_talent) REFERENCES talents (id_talent),
   ADD CONSTRAINT associer_ibfk_2 FOREIGN KEY (id_type) REFERENCES types (id_type);
 
-ALTER TABLE apparaitre
-  ADD CONSTRAINT apparaitre_ibfk_1 FOREIGN KEY (num_pokedex) REFERENCES pokemon (num_pokedex),
-  ADD CONSTRAINT apparaitre_ibfk_2 FOREIGN KEY (id_talent) REFERENCES talents (id_talent);
+ALTER TABLE detenir
+  ADD CONSTRAINT detenir_ibfk_1 FOREIGN KEY (num_pokedex) REFERENCES pokemon (num_pokedex),
+  ADD CONSTRAINT detenir_ibfk_2 FOREIGN KEY (id_talent) REFERENCES talents (id_talent);
