@@ -3,6 +3,9 @@ import type { ReactNode } from "react";
 import Pokemon from "./pages/Pokemon";
 import PokemonDetail from "./pages/PokemonDetail";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Admin from "./pages/Admin";
+
 
 // 1. Protection des routes
 const PrivateRoute = ({ children }: { children: ReactNode }) => {
@@ -10,16 +13,41 @@ const PrivateRoute = ({ children }: { children: ReactNode }) => {
   return token ? <>{children}</> : <Navigate to="/login" />;
 };
 
+
+
 // 2. Le Header (Toujours visible)
 const Header = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
   const userName = localStorage.getItem('userName');
+  const isAdmin = localStorage.getItem('isAdmin') === "true"; // Keep this line
 
-  const logout = () => {
+
+  const logout = async () => {
+    const token = localStorage.getItem('token');
+  
+    if (token) {
+      try {
+        // 1. On prévient le serveur (ça va déclencher le Log::create dans Laravel)
+        await fetch('http://localhost:8000/api/logout', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        });
+      } catch (error) {
+        console.error("Erreur lors de la déconnexion côté serveur", error);
+      }
+    }
+  
+    // 2. On vide tout et on redirige
     localStorage.clear();
     window.location.href = '/login';
   };
+
+  
 
   return (
     <header style={{ 
@@ -31,6 +59,15 @@ const Header = () => {
       <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
         {token && (
           <>
+          {/* BOUTON ADMIN : Apparaît uniquement si isAdmin est vrai */}
+          {isAdmin && ( // This line remains unchanged
+              <button 
+                onClick={() => navigate("/admin")}
+                style={{ backgroundColor: "gold", marginRight: "10px", fontWeight: "bold" }}
+              >
+                🛠️ Admin
+              </button>
+            )}
             <span style={{ fontWeight: "bold" }}>{userName}</span>
             <button onClick={logout} style={{ padding: "0.5rem 1rem", cursor: "pointer", borderRadius: "8px", backgroundColor: "#ff4444", color: "white", border: "none" }}>
               Déconnexion
@@ -42,10 +79,14 @@ const Header = () => {
   );
 };
 
+
+
 // 3. Structure principale
 export default function App() {
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
+  const isAdmin = localStorage.getItem('isAdmin') === "true"; // Keep this line
+
 
   const buttons = [
     { label: "Pokémons", path: "/pokemons" }
@@ -73,6 +114,8 @@ export default function App() {
                       {btn.label}
                     </button>
                   ))}
+                  {/* AJOUT DU BOUTON ADMIN À LA FIN DE LA LISTE */}
+  
                 </div>
               </div>
             </PrivateRoute>
@@ -81,9 +124,24 @@ export default function App() {
           {/* --- AUTRES PAGES --- */}
           <Route path="/pokemons" element={<PrivateRoute><Pokemon /></PrivateRoute>} />
           <Route path="/pokemons/:id" element={<PrivateRoute><PokemonDetail /></PrivateRoute>} />
-          
+          <Route 
+    path="/admin" 
+    element={
+      <PrivateRoute>
+        {localStorage.getItem('isAdmin') === "true" ? (
+        <Admin/> 
+      ) : (
+        <Navigate to="/"/>
+      )}
+        
+      </PrivateRoute>
+    } 
+  />
           {/* Page Login */}
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} /> {/* Ajoute cette ligne */}
+  
+  <Route path="/pokemons" element={<PrivateRoute><Pokemon /></PrivateRoute>} />
         </Routes>
       </main>
     </div>

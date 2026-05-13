@@ -1,0 +1,63 @@
+import { useEffect, useState } from 'react';
+
+const Admin = () => {
+    const [logs, setLogs] = useState([]);
+
+    useEffect(() => {
+        const fetchLogs = async () => {
+            try {
+                const response = await fetch('http://localhost:8000/api/admin/logs', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setLogs(data);
+                }
+            } catch (error) {
+                console.error("Erreur lors de la récupération des logs", error);
+            }
+        };
+
+        fetchLogs();
+    }, []);
+
+    return (
+        <div style={{ padding: "20px", color: "white" }}>
+            <h1 style={{ color: 'gold' }}>🛡️ Panneau d'Administration</h1>
+            
+            <div style={{ marginTop: '2rem', backgroundColor: '#1a1a1a', padding: '1.5rem', borderRadius: '12px' }}>
+                <h3>Journal d'activités</h3>
+                <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
+                    <thead>
+                        <tr style={{ borderBottom: '2px solid gold', color: 'gold', textAlign: 'left' }}>
+                            <th style={{ padding: '12px' }}>Date</th>
+                            <th style={{ padding: '12px' }}>Utilisateur</th>
+                            <th style={{ padding: '12px' }}>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {logs.length > 0 ? (
+                            logs.map((log: any) => (
+                                <tr key={log.id} style={{ borderBottom: '1px solid #333' }}>
+                                    <td style={{ padding: '12px' }}>{new Date(log.created_at).toLocaleString()}</td>
+                                    <td style={{ padding: '12px' }}>{log.user_name}</td>
+                                    <td style={{ padding: '12px' }}>{log.action}</td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan={3} style={{ padding: '20px', textAlign: 'center' }}>Aucun log trouvé</td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
+};
+
+export default Admin;

@@ -11,29 +11,35 @@ const Login = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError(null); // On réinitialise l'erreur à chaque clic
-    
         try {
-            const response = await fetch('http://localhost:8000/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
-    
-            const data = await response.json();
-    
-            if (response.ok) {
-                localStorage.setItem('token', data.access_token);
-                localStorage.setItem('userName', data.user.name);
-                window.location.href = '/'; 
-            } else {
-                // Ici, on récupère le message d'erreur envoyé par Laravel
-                setError(data.message || "Identifiants incorrects ou erreur serveur.");
-            }
+          const response = await fetch('http://localhost:8000/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+          });
+      
+          const data = await response.json();
+          console.log("Réponse complète de Laravel :", data);
+      
+          if (response.ok) {
+            // 1. On stocke le token et le nom
+            localStorage.setItem('token', data.access_token);
+            localStorage.setItem('userName', data.user.name);
+      
+            // 2. LA LIGNE CRUCIALE : On vérifie ce que renvoie Laravel
+            // On utilise "is_admin" (le nom de la colonne en BDD)
+            const isAdminValue = data.user.is_admin ? "true" : "false";
+            localStorage.setItem('isAdmin', isAdminValue);
+      
+            // 3. Redirection
+            window.location.href = '/';
+          } else {
+            setError(data.message);
+          }
         } catch (err) {
-            setError("Impossible de contacter le serveur. Vérifiez votre connexion.");
+          setError("Erreur de connexion");
         }
-    };
+      };
 
         return (
             <div style={{ 
