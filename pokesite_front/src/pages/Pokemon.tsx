@@ -128,7 +128,7 @@ if (Object.values(statFilters).some((val) => val !== undefined)) {
   return (
     
     <div style={{ display: "flex", flexDirection: "column", marginTop: "2rem", marginBottom: "2rem" }}>
-      <h1 style={{ textAlign: "center", width: "100%" }}>Liste des Pokémons</h1>
+      
       <input
         type="text"
         placeholder="Rechercher un Pokémon..."
