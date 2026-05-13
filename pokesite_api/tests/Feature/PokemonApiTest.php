@@ -5,12 +5,12 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 
 class PokemonApiTest extends TestCase
 {
-    use RefreshDatabase; // Vide la base de données de test à chaque lancement
+    use DatabaseTransactions; // Vide la base de données de test à chaque lancement
 
     /** 
      * TEST : CRÉATION DE COMPTE (REGISTER)
