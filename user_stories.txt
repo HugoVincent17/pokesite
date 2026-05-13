@@ -4,6 +4,7 @@ En tant qu'utilisateur je peux consulter tous les Pokémons des jeux
 En tant qu'utilisateur je peux trier en utilisant des critères de tri 
 En tant qu'utilisateur je peux rechercher un pokémon dans la barre de recherche
 En tant qu'utilisateur, je peux consulter la fiche de détails d'un pokémon
+En tant qu'administrateur, je peux consulter les journaux de connexion, de déconnexion et de création de compte, horodatés
 
 
 
