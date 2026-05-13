@@ -221,7 +221,7 @@ export default function PokemonDetail() {
       <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
         {resistances.map(([type, mult]) => (
           <div key={type} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            <span style={{ background: couleurType[type], color: "#000", padding: "5px 12px", borderRadius: "6px", fontWeight: "bold", fontSize: "0.9rem" }}>
+            <span style={{ background: couleurType[type], color: ["Sol", "Électrik", "Glace", "Plante", "Normal", "Acier"].includes(type.trim()) ? "black" : "white", padding: "5px 12px", borderRadius: "6px", fontWeight: "bold", fontSize: "0.9rem" }}>
               {type}
             </span>
             <span style={{ color: "#ffaa00", fontWeight: "bold" }}>x{mult}</span>
