@@ -12,7 +12,7 @@ export const couleurRarete: { [key: string]: string } = {
     Plante: "#55D944",
     Feu: "#FF3322",
     Eau: "#0099FF",
-    Électrik: "#FFFF00", //
+    Électrik: "#FFDE00", 
     Glace: "#51FFFF",
     Combat: "#FF6A00", 
     Poison: "#BF00FF", 
