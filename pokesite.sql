@@ -3253,4 +3253,5 @@ ALTER TABLE utiliser
 
 ALTER TABLE detenir
   ADD CONSTRAINT detenir_ibfk_1 FOREIGN KEY (num_pokedex) REFERENCES pokemon (num_pokedex),
-  ADD CONSTRAINT detenir_ibfk_2 FOREIGN KEY (id_talent) REFERENCES talents (id_talent);
+  ADD CONSTRAINT detenir_ibfk_2 FOREIGN KEY (id_talent) REFERENCES talents (id_talent),
+  ADD CONSTRAINT detenir_1 UNIQUE (num_pokedex);

@@ -158,7 +158,7 @@ export default function PokemonDetail() {
           </div>
           {/* Section des Talents */}
 <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#2a2a2a', borderRadius: '10px' }}>
-  <h3 style={{ borderBottom: '1px solid #555', paddingBottom: '10px' }}>Talents</h3>
+  <h3 style={{ borderBottom: '1px solid #555', paddingBottom: '10px' }}>Talent</h3>
   
   <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '10px' }}>
     {pokemon.talents && pokemon.talents.length > 0 ? (
