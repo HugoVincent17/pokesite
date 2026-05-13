@@ -55,8 +55,10 @@ class AuthController extends Controller
             'action' => 'S\'est déconnecté'
         ]);
 
-        $user->currentAccessToken()->delete();
-
+        if ($user->currentAccessToken()) {
+            $user->currentAccessToken()->delete();
+        }
+    
         return response()->json(['message' => 'Déconnecté']);
     }
 
