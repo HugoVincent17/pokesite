@@ -1,30 +1,39 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; 
+
+
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState<string | null>(null);
+    const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const response = await fetch('http://localhost:8000/api/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        });
-
-        const data = await response.json();
-        if (response.ok) {
-            localStorage.setItem('token', data.access_token);
-            
-            if (data.user && data.user.name) {
-                console.log("Nom trouvé :", data.user.name);
+        setError(null); // On réinitialise l'erreur à chaque clic
+    
+        try {
+            const response = await fetch('http://localhost:8000/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+    
+            const data = await response.json();
+    
+            if (response.ok) {
+                localStorage.setItem('token', data.access_token);
                 localStorage.setItem('userName', data.user.name);
+                window.location.href = '/'; 
             } else {
-                console.error("ATTENTION : Pas de nom dans data.user !", data);
+                // Ici, on récupère le message d'erreur envoyé par Laravel
+                setError(data.message || "Identifiants incorrects ou erreur serveur.");
             }
-            
-            window.location.href = '/'; // <--- COMMENTE CETTE LIGNE TEMPORAIREMENT
-        }}
+        } catch (err) {
+            setError("Impossible de contacter le serveur. Vérifiez votre connexion.");
+        }
+    };
 
         return (
             <div style={{ 
@@ -70,6 +79,26 @@ const Login = () => {
                             style={{ padding: "0.8rem", borderRadius: "6px", border: "1px solid #ccc" }}
                         />
                     </div>
+
+                    {/* Affichage de l'alerte d'erreur */}
+{error && (
+    <div style={{ 
+        backgroundColor: "#ffebee", 
+        color: "#c62828", 
+        padding: "0.8rem", 
+        borderRadius: "6px", 
+        marginBottom: "1rem",
+        fontSize: "0.9rem",
+        border: "1px solid #ef9a9a",
+        textAlign: "center"
+    }}>
+        {error}
+    </div>
+)}
+
+<p onClick={() => navigate('/register')} style={{ cursor: "pointer", marginTop: "1rem", color: "#666" }}>
+    Pas encore de compte ? Créer un profil
+</p>
         
                     <button 
                         type="submit" 
