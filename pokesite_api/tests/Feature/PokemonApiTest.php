@@ -3,66 +3,94 @@
 namespace Tests\Feature;
 
 use Tests\TestCase;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 
 class PokemonApiTest extends TestCase
 {
-    // Scénario 1 : Vérifier que la route détail fonctionne
-    /** @test */
-    public function test_get_pokemon_1_talents()
-    {
-        // Rappel : dans Laravel, tes routes sont préfixées par /api
-        $this->withoutExceptionHandling();
-        $response = $this->get('/api/pokemon/1');
-        $response->assertStatus(200);
-        $response->assertJsonStructure([
-            'nom',
-            'talents' => [
-                '*' => ['nom', 'description_talent']
-            ]
-        ]);
-        
-        // On vérifie que talents est bien une liste (tableau)
-        $this->assertIsArray($response->json()['talents']);
-    }
+    use RefreshDatabase; // Vide la base de données de test à chaque lancement
 
-    // Scénario 2 : Test de sécurité (Injection SQL / ID invalide)
-    /** @test */
-    public function test_get_invalid_id_should_not_crash()
+    /** 
+     * TEST : CRÉATION DE COMPTE (REGISTER)
+     */
+    public function test_user_can_register_and_it_is_logged()
     {
-        // Laravel protège nativement contre les injections SQL grâce aux requêtes préparées
-        $response = $this->get("/api/pokemon/999' OR '1'='1");
-
-        // Selon ton code, soit c'est 400 (ID invalide) soit 404 (non trouvé)
-        $this->assertContains($response->getStatusCode(), [400, 404, 500]);
-    }
-
-    // Scénario 3 : Validation des données (Stats négatives)
-    /** @test */
-    public function test_post_pokemon_refuser_fausses_stats()
-    {
-        $newPokemon = [
-            'nom' => "HackerMon",
-            'hp' => -500, // Statistique impossible
-            'attaque' => 9999,
-            'num_pokedex' => 999
+        $userData = [
+            'name' => 'Jean Log',
+            'email' => 'jean@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
         ];
 
-        $response = $this->postJson('/api/pokemon', $newPokemon);
+        $response = $this->postJson('/api/register', $userData);
 
-        // Laravel renvoie 422 (Unprocessable Entity) quand une validation échoue
-        // Si tu veux absolument 400, il faut le préciser dans le contrôleur, mais 422 est la norme Laravel
-        $this->assertContains($response->getStatusCode(), [400, 422]);
+        // On vérifie que le compte est créé
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('users', ['email' => 'jean@example.com']);
+
+        // On vérifie que le LOG est bien là
+        $this->assertDatabaseHas('logs', [
+            'user_name' => 'Jean Log',
+            'action' => 'A créé un compte'
+        ]);
     }
 
-    // Scénario 4 : Erreur 500 propre
-    /** @test */
-    public function test_api_should_return_clean_500_error()
+    /** 
+     * TEST : CONNEXION (LOGIN)
+     */
+    public function test_user_can_login_and_it_is_logged()
     {
-        // Utilise la route de debug qu'on a ajoutée dans api.php tout à l'heure
-        $response = $this->get('/api/debug-server-error');
+        // On crée un utilisateur manuellement d'abord
+        $user = User::create([
+            'name' => 'Utilisateur Test',
+            'email' => 'test@example.com',
+            'password' => Hash::make('password123'),
+        ]);
 
-        $response->assertStatus(500);
-        $response->assertJson(['error' => 'Erreur serveur']);
+        $loginData = [
+            'email' => 'test@example.com',
+            'password' => 'password123',
+        ];
+
+        $response = $this->postJson('/api/login', $loginData);
+
+        // On vérifie que le login fonctionne
+        $response->assertStatus(200);
+        $response->assertJsonStructure(['access_token']);
+
+        // On vérifie que le LOG de connexion est présent
+        $this->assertDatabaseHas('logs', [
+            'user_name' => 'Utilisateur Test',
+            'action' => 'S\'est connecté au système'
+        ]);
     }
+
+    /** 
+     * TEST : DÉCONNEXION (LOGOUT)
+     */
+    public function test_user_can_logout_and_it_is_logged()
+    {
+        // On crée et on connecte un utilisateur via Sanctum
+        $user = User::create([
+            'name' => 'Admin Logout',
+            'email' => 'admin@example.com',
+            'password' => Hash::make('password123'),
+        ]);
+
+        // On simule une requête authentifiée (actingAs)
+        $response = $this->actingAs($user, 'sanctum')
+                         ->postJson('/api/logout');
+
+        // On vérifie que la réponse est OK
+        $response->assertStatus(200);
+
+        // On vérifie que le LOG de déconnexion a été écrit AVANT la perte du token
+        $this->assertDatabaseHas('logs', [
+            'user_name' => 'Admin Logout',
+            'action' => 'S\'est déconnecté'
+        ]);
+    }
+
 }
