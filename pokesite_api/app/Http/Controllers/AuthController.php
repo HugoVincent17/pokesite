@@ -6,7 +6,7 @@ use App\Models\User;
 use App\Models\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth; // <-- Il manquait cet import !
+use Illuminate\Support\Facades\Auth; 
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
