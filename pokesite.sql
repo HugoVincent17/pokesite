@@ -3143,6 +3143,11 @@ CREATE TABLE detenir (
   id_talent int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+INSERT INTO detenir (num_pokedex, id_talent) VALUES
+(1, 13),
+(1,27);
+
+
 
 ALTER TABLE acceder
   ADD PRIMARY KEY (num_pokedex,id_meca),
