@@ -35,3 +35,5 @@ Route::get('/debug-server-error', function () {
 });
 
 Route::post('/logout', [AuthController::class, 'logout']);
+
+Route::post('/register', [AuthController::class, 'register']);
