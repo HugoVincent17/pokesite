@@ -106,7 +106,7 @@ export default function PokemonDetail() {
       <div style={{ display: "flex", alignItems: "center", padding: "1rem", background: `linear-gradient(90deg, ${couleurType[mainType]}99, transparent)` }}>
         <button onClick={() => navigate(-1)} style={{ background: "none", border: "none", color: "white", cursor: "pointer", fontSize: "1.5rem", marginRight: "1rem" }}>←</button>
         <img src={pokemon.img_mini} alt="mini" style={{ width: "40px", marginRight: "10px" }} />
-        <h1 style={{ margin: 0, fontSize: "1.8rem" || "white" }}>
+        <h1 style={{ margin: 0, fontSize: "1.8rem", color: "white" }}>
           #{pokemon.num_pokedex} - {pokemon.nom}
         </h1>
       </div>
