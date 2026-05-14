@@ -39,8 +39,16 @@ Route::get('/debug-server-error', function () {
 Route::post('/register', [AuthController::class, 'register']);
 
 Route::middleware('auth:sanctum')->group(function () {
+    
+    // Tout le monde (connecté) peut se déconnecter
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/admin/logs', function () {
-        return \App\Models\Log::orderBy('created_at', 'desc')->get();
+
+    // SEULS les admins peuvent voir les logs
+    Route::middleware('can-admin')->group(function () {
+        Route::get('/admin/logs', function () {
+            return \App\Models\Log::orderBy('created_at', 'desc')->get();
+        });
+        
+        
     });
 });
