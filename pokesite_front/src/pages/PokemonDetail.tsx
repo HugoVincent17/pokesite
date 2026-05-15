@@ -250,8 +250,8 @@ export default function PokemonDetail() {
 
 </div>
           <div style={{ background: "#252525", padding: "1rem", borderRadius: "15px", fontSize: "0.9rem" }}>
-            <p><strong>Génération :</strong> {pokemon.generation}</p>
-            <p><strong>Taux de capture :</strong> {pokemon.taux_capture}</p>
+            <p><strong>Génération : {pokemon.generation}</strong></p>
+            <p><strong>Taux de capture :{pokemon.taux_capture}</strong></p>
             <p><span style={{ color: couleurRarete[pokemon.rarete] }}>{pokemon.rarete}</span></p>  
           </div>
 
