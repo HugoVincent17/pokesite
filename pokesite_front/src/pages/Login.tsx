@@ -23,6 +23,7 @@ const Login = () => {
       
           if (response.ok) {
             // 1. On stocke le token et le nom
+            
             localStorage.setItem('token', data.access_token);
             localStorage.setItem('userName', data.user.name);
       
@@ -32,7 +33,7 @@ const Login = () => {
             localStorage.setItem('isAdmin', isAdminValue);
       
             // 3. Redirection
-            window.location.href = '/';
+            navigate('/');
           } else {
             setError(data.message);
           }
