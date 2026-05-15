@@ -21,6 +21,8 @@ class PokemonController extends Controller
             return [
                 'num_pokedex' => $first->num_pokedex,
                 'nom' => $first->nom,
+                'img' => $first->img,
+                'img_shiny' => $first->img_shiny,
                 'img_mini' => $first->img_mini,
                 'generation' => $first->generation,
                 'rarete' => $first->rarete,
