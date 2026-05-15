@@ -5,9 +5,20 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * CONTRÔLEUR DE GESTION DU POKÉDEX
+ * 
+ * Ce contrôleur centralise toute la logique de consultation et de manipulation des Pokémon.
+ * Il utilise l'interface Query Builder de Laravel (DB::table) pour des performances optimales
+ * lors des jointures complexes entre les Pokémon, leurs types et leurs talents.
+ */
+
 class PokemonController extends Controller
 {
-    // GET /api/pokemon
+    /**
+     * RÉCUPÉRATION GLOBALE DES POKÉMON
+     * Récupère l'intégralité du Pokédex avec les types associés.
+     */
     public function index() {
         $rows = DB::table('pokemon as p')
             ->select('p.*', 't.nom as nom_type')
@@ -15,6 +26,12 @@ class PokemonController extends Controller
             ->leftJoin('types as t', 't.id_type', '=', 'po.id_type')
             ->orderBy('p.num_pokedex')
             ->get();
+
+    /**
+     * STRUCTURATION DES DONNÉES (Génération du JSON)
+     * On groupe les lignes par numéro de Pokédex pour fusionner les doublons de types
+     * en un tableau propre
+     */
 
         $grouped = $rows->groupBy('num_pokedex')->map(function ($items) {
             $first = $items[0];
@@ -40,10 +57,18 @@ class PokemonController extends Controller
         return response()->json($grouped->values());
     }
 
-    // GET /api/pokemon/{id}
+    /**
+     * RÉCUPÉRATION DÉTAILLÉE D'UN POKÉMON (Detail)
+     * Inclut les types et les talents spécifiques.
+     */
     public function show($id) {
+        // Sécurité : Vérifie que l'ID est bien un nombre pour éviter les injections ou erreurs SQL
         if (!is_numeric($id)) return response()->json(['error' => 'ID invalide'], 400);
 
+        /**
+         * RÉCUPÉRATION DU POKÉMON AVEC TYPES
+         * Jointure pour obtenir les types associés au Pokémon via la table de liaison 'posseder'.
+         */
         $pokemonRows = DB::table('pokemon as p')
             ->select('p.*', 't.nom as nom_type')
             ->leftJoin('posseder as po', 'p.num_pokedex', '=', 'po.num_pokedex')
@@ -53,11 +78,17 @@ class PokemonController extends Controller
 
         if ($pokemonRows->isEmpty()) return response()->json(['error' => 'Introuvable'], 404);
 
+        /**
+         * RÉCUPÉRATION DES TALENTS
+         * Jointure séparée pour obtenir les talents via la table de liaison 'detenir'
+         */
         $talents = DB::table('talents as t')
             ->join('detenir as d', 't.id_talent', '=', 'd.id_talent')
             ->where('d.num_pokedex', $id)
             ->select('t.nom', 't.description_talent')
             ->get();
+
+        // Formatage final : Fusion des infos Pokémon + tableau de types + tableau de talents
 
         $pokemon = (array)$pokemonRows[0];
         $pokemon['types'] = $pokemonRows->pluck('nom_type')->filter()->values();
@@ -66,26 +97,13 @@ class PokemonController extends Controller
         return response()->json($pokemon);
     }
 
-    // GET /api/types
+    //récupération de tous les types
     public function allTypes() {
         return response()->json(DB::table('types')->get());
     }
 
-    // GET /api/talents
+    //récupération de tous les talents
     public function allTalents() {
         return response()->json(DB::table('talents')->get());
-    }
-
-    // POST /api/pokemon
-    public function store(Request $request) {
-        $validated = $request->validate([
-            'nom' => 'required',
-            'hp' => 'required|integer|min:0',
-            'attaque' => 'required|integer|min:0',
-            'num_pokedex' => 'required|integer',
-        ]);
-
-        // Ici tu pourrais faire le DB::table('pokemon')->insert($validated);
-        return response()->json(['message' => 'Pokémon créé'], 201);
     }
 }

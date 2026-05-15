@@ -9,6 +9,20 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth; 
 use Illuminate\Validation\ValidationException;
 
+/**
+ * CONTRÔLEUR D'AUTHENTIFICATION ET DE GESTION DES ACCÈS
+ * 
+ * Centralise toutes les opérations liées au cycle de vie de la session utilisateur.
+ * Elle sert d'interface entre les requêtes HTTP (Front-end) et le système d'identification 
+ * de Laravel (Sanctum).
+ * 
+ * 
+ * Inscription (Register) : Création de nouveaux comptes avec hachage sécurisé.
+ * Connexion (Login) : Vérification des identifiants et délivrance de tokens d'accès.
+ * Déconnexion (Logout) : Révocation et destruction des jetons d'accès.
+ * Communication avec le modèle Log pour assurer la traçabilité des actions critiques (connexion, déconnexion, création de compte).
+ */
+
 class AuthController extends Controller
 {
     /**
