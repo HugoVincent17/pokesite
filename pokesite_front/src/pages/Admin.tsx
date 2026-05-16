@@ -33,6 +33,8 @@ const Admin = () => {
         fetchLogs();
     }, []);
 
+    // Affichage d'une table listant les logs d'activité, avec des colonnes pour la date, l'utilisateur et l'action effectuée.
+    // Si aucun log n'est trouvé, on affiche un message indiquant qu'aucun log n'est disponible.
     return (
         <div style={{ padding: "20px", color: "white" }}>
             <h1 style={{ color: 'gold' }}>🛡️ Panneau d'Administration</h1>
