@@ -21,9 +21,10 @@ class PokemonApiTest extends TestCase
      */
     public function test_user_peut_se_register_et_est_dans_les_logs()
     {
+        //on crée un utilisateur temporaire pour le test d'inscription
         $userData = [
-            'name' => 'Jean Log',
-            'email' => 'jean@example.com',
+            'name' => 'PokeLog',
+            'email' => 'poke@example.com',
             'password' => 'password123',
             'password_confirmation' => 'password123',
         ];
@@ -36,7 +37,7 @@ class PokemonApiTest extends TestCase
 
         // On vérifie que le LOG est bien là
         $this->assertDatabaseHas('logs', [
-            'user_name' => 'Jean Log',
+            'user_name' => 'PokeLog',
             'action' => 'A créé un compte'
         ]);
     }
@@ -53,11 +54,13 @@ class PokemonApiTest extends TestCase
             'password' => Hash::make('password123'),
         ]);
 
+        // On tente de se connecter avec les identifiants
         $loginData = [
             'email' => 'test@example.com',
             'password' => 'password123',
         ];
 
+        // On simule une requête POST vers /api/login
         $response = $this->postJson('/api/login', $loginData);
 
         // On vérifie que le login fonctionne
@@ -107,8 +110,10 @@ class PokemonApiTest extends TestCase
         // On simule une requête sur l'index
         $response = $this->getJson('/api/pokemon');
 
+        // On vérifie que la requête est un succès
         $response->assertStatus(200);
         
+        // On vérifie que la réponse est un tableau de Pokémon avec les champs
         $response->assertJsonStructure([
             '*' => [
                 'num_pokedex', 
@@ -134,25 +139,29 @@ class PokemonApiTest extends TestCase
      */
     public function test_peut_recuperer_un_pokemon_par_son_num_pokedex()
     {
-        // On récupère un numéro existant en base
+        // On récupère un numéro existant dans la base de données de test
         $pokemon = DB::table('pokemon')->first();
 
         // Si la base est vide pendant le test, on évite l'erreur
         if (!$pokemon) {
-            $this->markTestSkipped('Aucun pokemon en base pour tester le detail.');
+            $this->markTestSkipped('Aucun pokemon dans la base de données pour tester le detail.');
         }
 
+        // On simule une requête sur le détail du Pokémon
         $response = $this->getJson("/api/pokemon/{$pokemon->num_pokedex}");
 
+        // On vérifie que la requête est un succès
         $response->assertStatus(200)
                  ->assertJsonPath('num_pokedex', $pokemon->num_pokedex)
                  ->assertJsonPath('nom', $pokemon->nom);
     }
 
     public function test_peut_recuperer_tous_les_types_disponibles()
-    {
+    {   
+        // On simule une requête sur la route des types
         $response = $this->getJson('/api/types');
 
+        // On vérifie que la requête est un succès
         $response->assertStatus(200);
         
         // On vérifie qu'on reçoit bien les noms des types (ex: Feu, Eau...)
@@ -171,9 +180,10 @@ class PokemonApiTest extends TestCase
     }
 
     public function test_renvoie_404_si_pokemon_introuvable()
-    {
+    {   
+        // On simule une requête sur un numéro de pokédex qui n'existe pas
         $response = $this->getJson('/api/pokemon/9999'); // ID qui n'existe pas
-
+        // On vérifie que la réponse est un 404 avec le message d'erreur
         $response->assertStatus(404)
                  ->assertJson(['error' => 'Introuvable']);
     }
@@ -183,17 +193,20 @@ class PokemonApiTest extends TestCase
      */
     public function test_renvoie_400_si_id_invalide()
     {
+        // On simule une requête avec un ID non numérique
         $response = $this->getJson('/api/pokemon/abc'); 
 
+        // On vérifie que la réponse est un 400 avec le message d'erreur
         $response->assertStatus(400)
                  ->assertJson(['error' => 'ID invalide']);
     }
 
     public function test_peut_recuperer_la_liste_des_pokemon_existants()
     {
-        // On tape directement dans la route
+        // On simule une requête sur l'index pour récupérer tous les Pokémon
         $response = $this->getJson('/api/pokemon');
 
+        // On vérifie que la requête est un succès
         $response->assertStatus(200);
 
         // On vérifie que la réponse n'est pas vide
@@ -216,33 +229,36 @@ class PokemonApiTest extends TestCase
                 'vitesse',
                 'taux_capture',
                 'rarete',
-                'types' // Vérifie que ton groupBy/pluck a fonctionné
+                'types' // Vérifie que les types sont bien inclus dans la réponse de l'index
             ]
         ]);
     }
 
     /**
-     * TEST : Détail d'un Pokémon (show) sur donnée réelle
+     * TEST : Détail d'un Pokémon sur donnée réelle
      */
     public function test_peut_recuperer_un_pokemon_reel_via_la_db()
     {
-        // On va chercher dynamiquement un numéro de pokédex qui existe vraiment en base
+        // On va chercher dynamiquement un numéro de pokédex qui existe vraiment dans la base de données de test
         $pokemon = DB::table('pokemon')->first();
 
-        // Si la base est vide, on arrête le test proprement
+        // Si la base de donnéesest vide, on arrête le test proprement
         if (!$pokemon) {
-            $this->markTestSkipped('Aucun Pokémon trouvé en base de données.');
+            $this->markTestSkipped('Aucun Pokémon trouvé dans la base de données.');
         }
 
+        // On utilise le numéro de pokédex du Pokémon trouvé pour tester la route de détail
         $id = $pokemon->num_pokedex;
 
+        // On simule une requête sur le détail du Pokémon
         $response = $this->getJson("/api/pokemon/{$id}");
 
+        // On vérifie que la requête est un succès et que les données correspondent
         $response->assertStatus(200)
                  ->assertJsonPath('num_pokedex', $id)
                  ->assertJsonStructure([
                      'nom', 
-                     'types', 
+                     'types', // Vérifie que les types sont bien inclus dans la réponse du détail
                      'talents' // Vérifie que la jointure avec 'detenir' fonctionne
                  ]);
     }
@@ -263,12 +279,12 @@ class PokemonApiTest extends TestCase
      */
     public function test_acces_admin_refuse_pour_utilisateur_basique()
     {
-        // On crée un utilisateur avec is_admin = 0 (ou false)
+        // On crée un utilisateur avec is_admin = 0 
         $user = User::create([
             'name' => 'Simple User',
-            'email' => 'user@pokedex.com',
+            'email' => 'user@poke.com',
             'password' => Hash::make('password123'),
-            'is_admin' => 0, // Assure-toi que cette colonne existe
+            'is_admin' => 0
         ]);
 
         // On tente d'accéder aux logs avec son token (actingAs)
@@ -286,11 +302,13 @@ class PokemonApiTest extends TestCase
     {
         // On crée un admin
         $admin = User::create([
-            'name' => 'Admin Boss',
-            'email' => 'admin@pokedex.com',
+            'name' => 'Admin Poke',
+            'email' => 'admin@poke.com',
             'password' => Hash::make('password123'),
             'is_admin' => 1,
         ]);
+
+        // On tente d'accéder aux logs avec son token (actingAs)
 
         $response = $this->actingAs($admin, 'sanctum')
                          ->getJson('/api/admin/logs');
@@ -306,15 +324,15 @@ class PokemonApiTest extends TestCase
      */
     public function test_un_log_peut_etre_cree()
     {
-        // 1. On crée un log via le modèle
+        // On crée un log via le modèle
         Log::create([
-            'user_name' => 'Sacha',
+            'user_name' => 'Hugo',
             'action' => 'A consulté le Pokédex'
         ]);
 
-        // 2. On vérifie qu'il existe bien dans la base de données
+        // On vérifie qu'il existe bien dans la base de données
         $this->assertDatabaseHas('logs', [
-            'user_name' => 'Sacha',
+            'user_name' => 'Hugo',
             'action' => 'A consulté le Pokédex'
         ]);
     }
@@ -343,21 +361,24 @@ class PokemonApiTest extends TestCase
      */
     public function test_un_utilisateur_peut_etre_cree_avec_ses_attributs()
     {
+        // On crée un utilisateur en utilisant le constructeur avec un tableau de données
         $userData = [
-            'name'     => 'Sacha du Bourg-Palette',
-            'email'    => 'sacha@pokedex.com',
-            'password' => 'pikapika123',
+            'name'     => 'Hugo le développeur',
+            'email'    => 'hugo@poke.com',
+            'password' => 'hugo1234',
             'is_admin' => 1
         ];
 
+        // Grâce à $fillable, tous les champs du tableau sont autorisés à être remplis
         $user = User::create($userData);
 
+        // On vérifie que l'utilisateur est bien dans la base de données avec les bons attributs
         $this->assertDatabaseHas('users', [
-            'email'    => 'sacha@pokedex.com',
+            'email'    => 'hugo@poke.com',
             'is_admin' => 1
         ]);
-        
-        $this->assertEquals('Sacha du Bourg-Palette', $user->name);
+        // On vérifie que les données sont correctement assignées à l'objet User
+        $this->assertEquals('Hugo le développeur', $user->name);
     }
 
     /**
@@ -365,15 +386,19 @@ class PokemonApiTest extends TestCase
      */
     public function test_les_donnees_sensibles_sont_masquees_lors_de_la_conversion_json()
     {
+        // On crée un utilisateur
         $user = User::create([
-            'name'     => 'Ondine',
-            'email'    => 'ondine@pokedex.com',
-            'password' => 'staross456',
+            'name'     => 'Hugo',
+            'email'    => 'hugo@dev.com',
+            'password' => 'hugo1234',
         ]);
 
+        // On convertit l'utilisateur en tableau (comme lors d'une réponse JSON)
         $arrayUser = $user->toArray();
 
         // Le mot de passe ne doit JAMAIS apparaître dans le tableau/JSON
+        // Le remember_token non plus
+        // Ces champs sont protégés par $hidden dans le modèle User
         $this->assertArrayNotHasKey('password', $arrayUser);
         $this->assertArrayNotHasKey('remember_token', $arrayUser);
     }
@@ -383,14 +408,15 @@ class PokemonApiTest extends TestCase
      */
     public function test_le_mot_de_passe_est_automatiquement_hache()
     {
+        // On crée un utilisateur avec un mot de passe en texte brut
         $password = 'secret_password';
         $user = User::create([
-            'name'     => 'Pierre',
-            'email'    => 'pierre@pokedex.com',
+            'name'     => 'Moi',
+            'email'    => 'moi@poke.com',
             'password' => $password,
         ]);
 
-        // On vérifie que le mot de passe en base n'est PAS le texte brut
+        // On vérifie que le mot de passe dans la base de données n'est PAS le texte brut
         $this->assertNotEquals($password, $user->password);
         
         // On vérifie qu'il est bien haché correctement (utilisable pour un login)
@@ -399,6 +425,7 @@ class PokemonApiTest extends TestCase
 
     public function test_is_admin_est_bien_autorise_malgre_l_attribut_php8()
     {
+        // On crée un utilisateur en utilisant le constructeur avec un champ 'is_admin' même si c'est un Attribut PHP8
         $user = new User(['is_admin' => 1]);
         
         // Si l'attribut PHP8 gagne, is_admin sera nul. 
@@ -408,6 +435,7 @@ class PokemonApiTest extends TestCase
 
     public function test_le_champ_email_verified_at_est_bien_un_objet_date()
     {
+        // On crée un utilisateur avec une date de vérification d'email
         $user = User::create([
             'name' => 'TestTesteur',
             'email' => 'test43@test.com',
@@ -415,19 +443,23 @@ class PokemonApiTest extends TestCase
             'email_verified_at' => '2026-05-15 10:00:00'
         ]);
 
+        // On vérifie que le champ email_verified_at est bien converti en objet Carbon (date)
         $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $user->email_verified_at);
     }
 
     public function test_l_utilisateur_peut_generer_un_token_sanctum()
     {
+        // On crée un utilisateur
         $user = User::create([
-            'name' => 'Sacha',
-            'email' => 'sacha@pokedex.com',
+            'name' => 'Utilisateur',
+            'email' => 'utilisateur@poke.com',
             'password' => 'password',
         ]);
 
+        // On génère un token d'accès pour cet utilisateur
         $token = $user->createToken('test-token')->plainTextToken;
 
+        // On vérifie que le token est généré et stocké dans la base de données
         $this->assertNotNull($token);
         $this->assertStringContainsString('test-token', $user->tokens()->first()->name);
     }
@@ -461,13 +493,11 @@ class PokemonApiTest extends TestCase
      */
     public function test_les_routes_api_sont_accessibles()
     {
-        // Si le routing est mal configuré dans app.php, cette route renverra une 404
+        // On simule une requête sur la route d'index des Pokémon pour vérifier que les routes sont bien chargées
         $response = $this->getJson('/api/pokemon');
         
-        // On vérifie que le statut n'est pas 404
+        // On vérifie que la route est accessible (200 OK) et pas un 404 (Not Found)
         $response->assertStatus(200); 
-        // OU si tu veux juste être sûr que la route existe (même si elle est vide) :
-        // $this->assertNotEquals(404, $response->getStatusCode());
     }
 
 }
