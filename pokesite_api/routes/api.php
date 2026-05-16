@@ -61,11 +61,20 @@ Route::get('/debug-server-error', function () {
 */
 Route::middleware('auth:sanctum')->group(function () {
     
-    // Tout le monde (connecté) peut se déconnecter
+    // Déconnexion : Nécessite logiquement d'être connecté pour révoquer son propre token
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    // SEULS les admins peuvent voir les logs
+    /**
+    * Contrôle d'accès basé sur les rôles
+    * Utilise l'alias 'can-admin' (déclaré dans bootstrap/app.php) pour filtrer les requêtes.
+    * Seuls les utilisateurs connectés possédant 'is_admin == true' franchissent cette barrière.
+    */
     Route::middleware('can-admin')->group(function () {
+        /**
+        * CONSULTATION DU JOURNAL (LOGS)
+        * Récupère l'historique complet des actions utilisateurs, trié du plus récent au plus ancien.
+        * Sécurité : Cette route est doublement protégée (doit être connecté + doit être admin).
+        */
         Route::get('/admin/logs', function () {
             return \App\Models\Log::orderBy('created_at', 'desc')->get();
         });
