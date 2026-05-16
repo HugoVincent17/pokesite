@@ -1,33 +1,47 @@
 <?php 
+/**
+* ROUTES DE L'API (ROUTING & MIDDLEWARES)
+* 
+* Ce fichier définit tous les points d'entrée de l'API REST.
+* Toutes ces routes sont automatiquement préfixées par '/api' grâce à la configuration de Laravel.
+*/
+
 use App\Http\Controllers\PokemonController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Models\Log;
 
-Route::post('/login', [AuthController::class, 'login']);
+/**
+* ==========================================
+*  ROUTES PUBLIQUES (OUVERTES)
+* ==========================================
+*/
 
-// Route racine de l'API
+// Point de contrôle pour tester la disponibilité de l'API
 Route::get('/', function () {
     return "API Pokédex en ligne";
 });
 
-/*Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
-});*/
+// Authentification & Inscription : Permet aux utilisateurs d'entrer dans le système
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
 
-// Routes Pokemon
+
+// Permet au Front-end d'afficher les données Pokémon 
 Route::get('/pokemon', [PokemonController::class, 'index']);
 Route::get('/pokemon/{id}', [PokemonController::class, 'show']);
 Route::post('/pokemon', [PokemonController::class, 'store']);
 
-// Nouvelles routes pour correspondre à tes besoins
+// Fournit les listes de référence pour l'interface utilisateur
 Route::get('/types', [PokemonController::class, 'allTypes']);
 Route::get('/talents', [PokemonController::class, 'allTalents']);
 
-// Route de test d'erreur 500
+/**
+* ROUTES DE SIMULATION DE PANNES (TESTING)
+* Ces routes sont destinées à simuler des erreurs serveur pour tester la résilience du Front-end et la gestion des erreurs.
+* Elles ne font que retourner une réponse JSON avec un code d'erreur 500.
+* Ces routes sont utilisées uniquement pour les tests de développement et doivent être retirées ou protégées en production.
+*/
 Route::get('/pokemon/error-trigger', function () {
     return response()->json(['error' => 'Erreur serveur'], 500);
 });
@@ -35,9 +49,16 @@ Route::get('/debug-server-error', function () {
     return response()->json(['error' => 'Erreur serveur'], 500);
 });
 
+/**
+* ==========================================
+*  ROUTES SÉCURISÉES (MIDDLEWARES)
+* ==========================================
+*/
 
-Route::post('/register', [AuthController::class, 'register']);
-
+/**
+* Authentification obligatoire via Laravel Sanctum
+* Le middleware 'auth:sanctum' intercepte la requête et vérifie la validité du Token fourni dans le header.
+*/
 Route::middleware('auth:sanctum')->group(function () {
     
     // Tout le monde (connecté) peut se déconnecter
