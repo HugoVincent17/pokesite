@@ -1,18 +1,25 @@
 import { useEffect, useState } from 'react';
 
+// Page d'administration accessible uniquement aux utilisateurs avec le rôle admin
 const Admin = () => {
+    // useState pour stocker les logs d'activité récupérés depuis l'API
     const [logs, setLogs] = useState([]);
 
+    // useEffect pour récupérer les logs d'activité depuis l'API au chargement du composant
     useEffect(() => {
+        // Fonction asynchrone pour récupérer les logs d'activité depuis l'API
         const fetchLogs = async () => {
             try {
+                // Envoi d'une requête GET à l'API pour récupérer les logs d'activité, en incluant le token d'authentification dans les headers
                 const response = await fetch('http://localhost:8000/api/admin/logs', {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`,
                         'Accept': 'application/json'
                     }
                 });
-
+                
+                // Si la réponse est positive, on parse les données en JSON et on les stocke dans le state "logs" pour les afficher 
+                // dans la table. Sinon, on log une erreur.
                 if (response.ok) {
                     const data = await response.json();
                     setLogs(data);
@@ -22,6 +29,7 @@ const Admin = () => {
             }
         };
 
+        // Appel de la fonction de récupération des logs d'activité au chargement du composant
         fetchLogs();
     }, []);
 
