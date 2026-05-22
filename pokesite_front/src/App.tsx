@@ -107,10 +107,8 @@ const Header = () => {
 
 // COMPOSANT PRINCIPAL DE L'APPLICATION
 export default function App() {
-  // Récupération du token et du rôle d'administrateur depuis le localStorage pour gérer l'affichage conditionnel et les redirections
+
   const navigate = useNavigate();
-  const token = localStorage.getItem('token');
-  const isAdmin = localStorage.getItem('isAdmin') === "true";
 
   // RÈGLE MÉTIER : Définition d'une liste de boutons de navigation pour la page d'accueil. 
   // Le bouton Admin est géré séparément dans le Header pour un affichage conditionnel plus clair.
