@@ -187,7 +187,7 @@ export default function PokemonDetail() {
             {pokemon.talents && pokemon.talents.length > 0 ? (
               pokemon.talents.map((t, index) => (
                 <div key={index} className="talent-card">
-                  <strong style={{ color: couleurRarete[pokemon.rarete] }}>{t.nom}</strong>
+                  <strong style={{ color: couleurType[pokemon.types[0]] }}>{t.nom}</strong>
                   <p style={{ margin: '5px 0 0 0', fontSize: '0.9em', color: '#ccc', lineHeight: '1.4' }}>
                     {t.description_talent}
                   </p>
