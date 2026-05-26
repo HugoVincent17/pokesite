@@ -151,7 +151,6 @@ export default function App() {
           {/* --- AUTRES PAGES --- */}
           {/* Les pages Pokémon et Admin sont protégées par des routes privées. 
               La page Admin a une vérification supplémentaire pour s'assurer que seul les utilisateurs avec isAdmin=true peuvent y accéder. */}
-          
           <Route path="/pokemons" element={<PrivateRoute><Pokemon /></PrivateRoute>} />
           <Route path="/pokemons/:id" element={<PrivateRoute><PokemonDetail /></PrivateRoute>} />
           <Route 
