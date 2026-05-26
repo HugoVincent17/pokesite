@@ -11,7 +11,8 @@ const Admin = () => {
         const fetchLogs = async () => {
             try {
                 // Envoi d'une requête GET à l'API pour récupérer les logs d'activité, en incluant le token d'authentification dans les headers
-                const response = await fetch('http://localhost:8000/api/admin/logs', {
+                const url = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+                const response = await fetch(`${url}/admin/logs`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`,
                         'Accept': 'application/json'

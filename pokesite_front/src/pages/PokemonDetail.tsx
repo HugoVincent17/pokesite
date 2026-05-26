@@ -40,7 +40,8 @@ export default function PokemonDetail() {
 
   useEffect(() => {
     // Lorsqu'un utilisateur clique sur un Pokémon dans la liste, il est redirigé vers cette page de détail.
-    fetch(`http://localhost:8000/api/pokemon/${id}`)
+    const url = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+    fetch(`${url}/pokemon/${id}`)
       .then(res => res.json())
       .then(data => setPokemon(data))
       .catch(err => console.error(err));
