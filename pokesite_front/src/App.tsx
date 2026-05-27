@@ -47,7 +47,7 @@ const Header = () => {
       try {
         //On prévient le serveur (ça va déclencher le Log::create dans Laravel)
         // On envoie une requête POST à l'endpoint de déconnexion du serveur
-        const url = "http://localhost:8000/api"; 
+        const url = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
         await fetch(`${url}/logout`, {
           method: 'POST',
           // On inclut le token dans les headers pour que le serveur puisse identifier l'utilisateur qui se déconnecte

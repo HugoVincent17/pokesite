@@ -101,7 +101,7 @@ it('envoie les bonnes données JSON au serveur', async () => {
     fireEvent.click(screen.getByRole('button', { name: /se connecter/i }));
 
     await waitFor(() => {
-        const url = "http://localhost:8000/api"; 
+        const url = import.meta.env.VITE_API_URL || "http://localhost:8000/api"; 
         expect(fetch).toHaveBeenCalledWith(
             `${url}/login`,
             expect.objectContaining({
