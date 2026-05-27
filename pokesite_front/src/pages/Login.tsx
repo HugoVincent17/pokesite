@@ -12,7 +12,7 @@ const Login = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const url = import.meta.env.VITE_APP_URL;
+            const url = import.meta.env.VITE_API_URL;
             const response = await fetch(`${url}/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

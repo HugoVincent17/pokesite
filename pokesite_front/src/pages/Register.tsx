@@ -23,7 +23,7 @@ const Register = () => {
         }
 
         try {
-            const url = import.meta.env.VITE_APP_URL;
+            const url = import.meta.env.VITE_API_URL;
             // Envoi d'une requête POST à l'API pour créer un nouvel utilisateur
             const response = await fetch(`${url}/register`, {
                 method: 'POST',

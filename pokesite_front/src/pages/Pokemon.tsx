@@ -75,7 +75,7 @@ export default function Pokemon() {
   // problèmes de dépendances et pour s'assurer qu'elle n'est pas recréée à chaque rendu.
   useEffect(() => {
     async function fetchData() {
-      const url = import.meta.env.VITE_APP_URL;
+      const url = import.meta.env.VITE_API_URL;
       const res = await fetch(`${url}/pokemon`);
       const data = await res.json();
       setPokemons(data);
