@@ -12,12 +12,18 @@ const Login = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const url = import.meta.env.VITE_API_URL || "http://localhost:8000/api"; 
+
+            const url = process.env.API_URL;
+            console.log("Tentative de connexion POST sur :", url);
+
             const response = await fetch(`${url}/login`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
                 body: JSON.stringify({ email, password })
-          });
+            });
           
           // On attend la réponse du serveur et on la parse en JSON
           const data = await response.json();
@@ -41,6 +47,7 @@ const Login = () => {
             setError(data.message);
           }
         } catch (err) {
+          console.error("Erreur critique attrapée dans le formulaire :", err);
           setError("Erreur de connexion");
         }
     };

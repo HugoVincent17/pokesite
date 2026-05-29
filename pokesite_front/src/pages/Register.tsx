@@ -23,8 +23,8 @@ const Register = () => {
         }
 
         try {
-            const url = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
-            console.log("API URL:", import.meta.env.VITE_API_URL);
+            const url = process.env.API_URL;
+            
             // Envoi d'une requête POST à l'API pour créer un nouvel utilisateur
             const response = await fetch(`${url}/register`, {
                 method: 'POST',

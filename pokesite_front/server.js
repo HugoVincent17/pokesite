@@ -1,9 +1,20 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+dotenv.config({ path: path.join(__dirname, '.env') });
 const app = express();
+
+const API_URL = process.env.API_URL;
+
+console.log(`[Configuration] L'API pointe actuellement sur : ${API_URL}`)
 
 // Désactive la signature Express (cache la techno utilisée)
 app.disable('x-powered-by');
@@ -33,3 +44,4 @@ app.get('*splat', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => console.log(`Front sur http://0.0.0.0:${PORT}`));
+
