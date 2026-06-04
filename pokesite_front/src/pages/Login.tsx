@@ -26,6 +26,7 @@ const Login = () => {
             });
           
           // On attend la réponse du serveur et on la parse en JSON
+          console.log("Status:", response.status);
           const data = await response.json();
           console.log("Réponse complète de Laravel :", data);
           
