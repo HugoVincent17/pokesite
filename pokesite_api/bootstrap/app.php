@@ -32,6 +32,11 @@ return Application::configure(basePath: dirname(__DIR__))
         * Sécurité : Ce middleware vérifie que l'utilisateur est authentifié et possède les droits d'administrateur avant 
         * d'accéder aux ressources sensibles (logs).
         */
+    
+    $middleware->use([
+        \Illuminate\Http\Middleware\HandleCors::class,
+    ]);
+    
     $middleware->alias([
         'can-admin' => \App\Http\Middleware\AdminMiddleware::class, 
     ]);
