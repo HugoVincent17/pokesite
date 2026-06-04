@@ -2,6 +2,7 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
+import fs from 'fs';
 
 dotenv.config();
 
@@ -39,7 +40,12 @@ app.use(express.static(path.join(__dirname, 'dist'), {
 
 // Renvoie index.html pour le routing React
 app.get('*splat', (req, res) => {
-    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+    const html = fs.readFileSync(path.join(__dirname, 'dist', 'index.html'), 'utf-8');
+    const injected = html.replace(
+        '<head>',
+        `<head><script>window.API_URL = "${API_URL}";</script>`
+    );
+    res.send(injected);
 });
 
 const PORT = process.env.PORT || 3000;
