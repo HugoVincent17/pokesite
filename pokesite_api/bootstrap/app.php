@@ -33,7 +33,7 @@ return Application::configure(basePath: dirname(__DIR__))
         * d'accéder aux ressources sensibles (logs).
         */
     
-    $middleware->use([
+    $middleware->prepend([
         \Illuminate\Http\Middleware\HandleCors::class,
     ]);
     
