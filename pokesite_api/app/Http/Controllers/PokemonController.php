@@ -7,8 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * CONTRÔLEUR DE GESTION DU POKÉDEX
- * 
- * Ce contrôleur centralise toute la logique de consultation et de manipulation des Pokémon.
+ * * Ce contrôleur centralise toute la logique de consultation et de manipulation des Pokémon.
  * Il utilise l'interface Query Builder de Laravel (DB::table) pour des performances optimales
  * lors des jointures complexes entre les Pokémon, leurs types et leurs talents.
  */
@@ -19,11 +18,17 @@ class PokemonController extends Controller
      * RÉCUPÉRATION GLOBALE DES POKÉMON
      * Récupère l'intégralité du Pokédex avec les types associés.
      */
-    public function index() {
+    public function index(Request $request) {
+        $userId = $request->user() ? $request->user()->id : null;
+
         $rows = DB::table('pokemon as p')
-            ->select('p.*', 't.nom as nom_type')
+            ->select('p.*', 't.nom as nom_type', 'f.user_id as is_fav')
             ->leftJoin('posseder as po', 'p.num_pokedex', '=', 'po.num_pokedex')
             ->leftJoin('types as t', 't.id_type', '=', 'po.id_type')
+            ->leftJoin('favoris as f', function($join) use ($userId) {
+                $join->on('p.num_pokedex', '=', 'f.num_pokedex')
+                     ->where('f.user_id', '=', $userId);
+            })
             ->orderBy('p.num_pokedex')
             ->get();
 
@@ -50,7 +55,8 @@ class PokemonController extends Controller
                 'defense_spe' => $first->defense_spe,
                 'vitesse' => $first->vitesse,
                 'taux_capture' => $first->taux_capture,
-                'types' => $items->pluck('nom_type')->filter()->values()
+                'types' => $items->pluck('nom_type')->filter()->values(),
+                'is_favorite' => !is_null($first->is_fav)
             ];
         });
 

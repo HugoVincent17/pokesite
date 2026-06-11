@@ -500,4 +500,98 @@ class PokemonApiTest extends TestCase
         $response->assertStatus(200); 
     }
 
+    // test si un utilisateur peut ajouter un favori
+
+    public function test_un_utilisateur_peut_ajouter_un_favori()
+    {
+        // Créer un utilisateur fictif
+        $user = User::factory()->create();
+
+        // Données envoyées par le Front-end (React)
+        $data = [
+            'num_pokedex' => 25 
+        ];
+
+        // Simuler la connexion de l'utilisateur et envoyer la requête POST
+        $response = $this->actingAs($user)
+            ->postJson('/api/favoris', $data);
+
+        // Vérifier que Laravel répond bien avec un statut 201 (Créé)
+        $response->assertStatus(201)
+                 ->assertJson(['message' => 'Ajouté aux favoris !']);
+
+        // Vérifier que la ligne a bien été insérée dans la table de la BDD
+        $this->assertDatabaseHas('favoris', [
+            'user_id' => $user->id,
+            'num_pokedex' => 25
+        ]);
+    }
+
+    
+     //Test : Est-ce qu'un utilisateur peut bien retirer un favori
+     
+    public function test_un_utilisateur_peut_retirer_un_favori()
+    {
+        // Créer un utilisateur fictif
+        $user = User::factory()->create();
+
+        // Insérer manuellement un favori en BDD pour cet utilisateur
+        DB::table('favoris')->insert([
+            'user_id' => $user->id,
+            'num_pokedex' => 6 
+        ]);
+
+        // Simuler la connexion et envoyer la requête DELETE sur l'id (num_pokedex)
+        $response = $this->actingAs($user)
+            ->deleteJson('/api/favoris/6');
+
+        // Vérifier la réponse de succès
+        $response->assertStatus(200)
+                 ->assertJson(['message' => 'Retiré des favoris.']);
+
+        // Vérifier que la ligne a bien été SUPPRIMÉE de la BDD
+        $this->assertDatabaseMissing('favoris', [
+            'user_id' => $user->id,
+            'num_pokedex' => 6
+        ]);
+    }
+
+    
+     //3. Test : Est-ce que les favoris sont différents selon les utilisateurs
+    
+    public function test_les_favoris_sont_differents_selon_les_utilisateurs()
+    {
+        // Créer deux utilisateurs distincts
+        $userA = User::factory()->create();
+        $userB = User::factory()->create();
+
+        // Ajouter un favori (Pikachu) uniquement à l'utilisateur A
+        DB::table('favoris')->insert([
+            'user_id' => $userA->id,
+            'num_pokedex' => 25
+        ]);
+
+        // Ajouter un favori différent (Carapuce) uniquement à l'utilisateur B
+        DB::table('favoris')->insert([
+            'user_id' => $userB->id,
+            'num_pokedex' => 7
+        ]);
+
+        // On vérifie la liste de l'utilisateur A 
+        $responseA = $this->actingAs($userA)->getJson('/api/favoris');
+        
+        $responseA->assertStatus(200);
+        // L'utilisateur A doit avoir le pokémon 25 mais PAS le pokémon 7
+        $this->assertTrue(collect($responseA->json())->contains('num_pokedex', 25));
+        $this->assertFalse(collect($responseA->json())->contains('num_pokedex', 7));
+
+        // ÉTAPE 2 : On vérifie la liste de l'utilisateur B
+        $responseB = $this->actingAs($userB)->getJson('/api/favoris');
+        
+        $responseB->assertStatus(200);
+        // L'utilisateur B doit avoir le pokémon 7 mais PAS le pokémon 25
+        $this->assertTrue(collect($responseB->json())->contains('num_pokedex', 7));
+        $this->assertFalse(collect($responseB->json())->contains('num_pokedex', 25));
+    }
+
 }

@@ -17,6 +17,7 @@ type Pokemon = {
   attaque_spe: number;
   defense_spe: number;
   vitesse: number;
+  is_favorite: boolean; //  AJOUT DU TYPE BOOLEEN POUR LES FAVORIS
 };
 
 // Type pour les clés de stats, utilisé pour le filtrage dynamique.
@@ -45,6 +46,7 @@ export default function Pokemon() {
     vitesse: searchParams.get("vitesse") ? Number(searchParams.get("vitesse")) : undefined,
   });
   const [statMode, setStatMode] = useState(searchParams.get("statMode") !== "false");
+  const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
   // useEffect pour synchroniser les paramètres de l'URL avec les états de filtrage. 
   // Chaque fois qu'un critère de filtrage change, les paramètres de l'URL sont mis à jour en conséquence, 
   // permettant ainsi de conserver l'état de l'application dans l'URL.
@@ -76,10 +78,51 @@ export default function Pokemon() {
   useEffect(() => {
     async function fetchData() {
       const url = process.env.API_URL;
-      const res = await fetch(`${url}/pokemon`);
-      const data = await res.json();
-      setPokemons(data);
+      const token = localStorage.getItem("token"); // RECUPERATION DU TOKEN
+      try {
+        // Récupérer tous les Pokémon
+        const resPokemon = await fetch(`${url}/pokemon`, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Accept": "application/json"
+          }
+        });
+        const allPokemons: Pokemon[] = await resPokemon.json();
+
+        // Récupérer uniquement les favoris de l'utilisateur connecté
+        const resFavoris = await fetch(`${url}/favoris`, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Accept": "application/json"
+          }
+        });
+        
+        // Si l'utilisateur est connecté et qu'on récupère ses favoris
+        if (resFavoris.ok) {
+          const favorisUser: Pokemon[] = await resFavoris.json();
+          
+          // Créer un Set des numéros de Pokédex mis en favoris pour une recherche rapide
+          const favIds = new Set(favorisUser.map(f => f.num_pokedex));
+
+          // Associer le bon état "is_favorite" à la liste globale
+          const pokemonsAjustes = allPokemons.map(p => ({
+            ...p,
+            is_favorite: favIds.has(p.num_pokedex) // Devient true si le Pokémon est dans les favoris
+          }));
+
+          setPokemons(pokemonsAjustes);
+        } else {
+          // Si pas de favoris ou token expiré, on affiche la liste normale
+          setPokemons(allPokemons);
+        }
+
+      } catch (error) {
+        console.error("Erreur lors du chargement des données :", error);
+      }
     }
+    
     fetchData();
   }, []);
   
@@ -138,6 +181,10 @@ export default function Pokemon() {
       }// filtre par stats
     });}
 
+    if (showOnlyFavorites) {
+      filteredPokemons = filteredPokemons.filter(p => p.is_favorite === true);
+    }// filtre pour n'afficher que les favoris si l'option est activée
+
     // Fonction pour gérer la sélection/désélection des types de Pokémon.
     const toggleType = (type: string) => {
       setSelectedTypes((prev) =>
@@ -147,6 +194,36 @@ export default function Pokemon() {
       );
 
     }
+
+  // INTERRUPTEUR POUR AJOUTER OU RETIRER UN POKÉMON DES FAVORIS EN BDD
+  const toggleFavorite = async (numPokedex: number, currentIsFavorite: boolean) => {
+    const token = localStorage.getItem("token");
+    const url = process.env.API_URL;
+    const method = currentIsFavorite ? "DELETE" : "POST";
+    const endpoint = currentIsFavorite ? `${url}/favoris/${numPokedex}` : `${url}/favoris`;
+
+    try {
+      const response = await fetch(endpoint, {
+        method: method,
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Accept": "application/json",
+          "Content-Type": "application/json"
+        },
+        body: currentIsFavorite ? null : JSON.stringify({ num_pokedex: numPokedex })
+      });
+
+      if (response.ok) {
+        setPokemons((prevPokemons) =>
+          prevPokemons.map((p) =>
+            p.num_pokedex === numPokedex ? { ...p, is_favorite: !currentIsFavorite } : p
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Erreur lors de la modification du favori", error);
+    }
+  };
 
   // Rendu du composant avec les différentes sections :
   // barre de recherche, filtres de types, rareté, génération, stats, et la liste des Pokémon filtrés.
@@ -298,6 +375,30 @@ export default function Pokemon() {
           ))}{/* boutons pour chaque rareté de pokémon */}
         </div>
 
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: "2rem" }}>
+          <button
+            onClick={() => setShowOnlyFavorites(!showOnlyFavorites)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              background: showOnlyFavorites ? "#FFD700" : "rgba(255, 255, 255, 0.1)",
+              color: showOnlyFavorites ? "black" : "#87CEEB",
+              border: `2px solid ${showOnlyFavorites ? "#FFD700" : "#87CEEB"}`,
+              padding: "0.6rem 1.2rem",
+              borderRadius: "20px",
+              cursor: "pointer",
+              fontWeight: "bold",
+              fontSize: "1rem",
+              transition: "all 0.3s ease",
+              boxShadow: showOnlyFavorites ? "0 0 12px rgba(255, 215, 0, 0.4)" : "none"
+            }}
+          >
+            <span style={{ fontSize: "1.2rem" }}>{showOnlyFavorites ? "\u2605" : "\u2606"}</span>
+            {showOnlyFavorites ? "Voir tous les Pokémon" : "Afficher mes Favoris"}
+          </button>
+        </div>
+
         <div
           style={{
             display: "flex",
@@ -328,6 +429,7 @@ export default function Pokemon() {
                 background: `linear-gradient(145deg, ${couleurType[mainType] || couleurType["Normal"]} 0%, #ffffff30 100%)`,
                 cursor: "pointer",
                 transition: "transform 0.3s ease, box-shadow 0.3s ease", 
+                position: "relative" // <-- COMPOSANT PARENT EN POSITION RELATIVE POUR L'ÉTOILE
               }}
               onMouseEnter={(e) => {
                 (e.currentTarget as HTMLDivElement).style.transform = "scale(1.05)";
@@ -339,7 +441,31 @@ export default function Pokemon() {
                 {/* Les cartes de Pokémon ont un effet de survol qui les fait légèrement grandir et ajoute une ombre plus prononcée pour indiquer qu'elles sont interactives. */}
               }} 
             >{/* Carte de chaque pokémon
-              Link cliquable qui mène à la page de détails du Pokémon */}
+               Link cliquable qui mène à la page de détails du Pokémon */}
+              
+              {/* BOUTON ÉTOILE INTERACTIF */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation(); // Empêche l'ouverture de la fiche détail
+                  toggleFavorite(pokemon.num_pokedex, pokemon.is_favorite);
+                }}
+                style={{
+                  position: "absolute",
+                  top: "5px",
+                  right: "5px",
+                  background: "none",
+                  border: "none",
+                  fontSize: "1.3rem",
+                  cursor: "pointer",
+                  zIndex: 10,
+                  // Changement de la couleur selon si c'est favori ou non
+                  color: pokemon.is_favorite ? "#FFD700" : "#FFFFFF",
+                  textShadow: "0 1px 3px rgba(0,0,0,0.5)"
+                }}
+              >
+                {pokemon.is_favorite ? "\u2605" : "\u2606"}
+              </button>
+
               <Link to={`/pokemons/${pokemon.num_pokedex}`} style={{ textDecoration: "none", color: "inherit" }}>
                 <img src={pokemon.img_mini} alt={pokemon.nom} style={{ maxWidth: "100%", height: "auto", margin: "0 auto" }} />
                 <p>{pokemon.num_pokedex}</p>

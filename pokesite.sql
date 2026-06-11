@@ -3382,3 +3382,15 @@ ALTER TABLE detenir
   ADD CONSTRAINT detenir_ibfk_1 FOREIGN KEY (num_pokedex) REFERENCES pokemon (num_pokedex),
   ADD CONSTRAINT detenir_ibfk_2 FOREIGN KEY (id_talent) REFERENCES talents (id_talent),
   ADD CONSTRAINT detenir_1 UNIQUE (num_pokedex);
+
+create table favoris (
+	user_id bigint unsigned not null,
+	num_pokedex int not NULL
+);
+
+
+
+ALTER TABLE favoris
+ADD PRIMARY KEY (user_id, num_pokedex),
+ADD CONSTRAINT fk_favoris_user FOREIGN KEY (user_id) REFERENCES users(id),
+ADD CONSTRAINT fk_favoris_pokemon FOREIGN KEY (num_pokedex) REFERENCES pokemon(num_pokedex);

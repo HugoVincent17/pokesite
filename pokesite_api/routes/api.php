@@ -10,6 +10,7 @@ use App\Http\Controllers\PokemonController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Models\Log;
+use App\Http\Controllers\FavoriController;
 
 /**
 * ==========================================
@@ -64,6 +65,15 @@ Route::middleware('auth:sanctum')->group(function () {
     // Déconnexion : Nécessite logiquement d'être connecté pour révoquer son propre token
     Route::post('/logout', [AuthController::class, 'logout']);
 
+    // GET : Récupérer la liste des Pokémon favoris de l'utilisateur connecté
+    Route::get('/favoris', [FavoriController::class, 'index']);
+        
+    // POST : Ajouter un Pokémon aux favoris
+    Route::post('/favoris', [FavoriController::class, 'store']);
+    
+    // DELETE : Retirer un Pokémon des favoris (on passe le numéro du pokedex dans l'URL)
+    Route::delete('/favoris/{id}', [FavoriController::class, 'destroy']);
+
     /**
     * Contrôle d'accès basé sur les rôles
     * Utilise l'alias 'can-admin' (déclaré dans bootstrap/app.php) pour filtrer les requêtes.
@@ -78,7 +88,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/admin/logs', function () {
             return \App\Models\Log::orderBy('created_at', 'desc')->get();
         });
-        
-        
+            
+        });
     });
-});
